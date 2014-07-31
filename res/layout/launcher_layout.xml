@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<LinearLayout android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+    <EditText android:id="@+id/launcher_username_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Username"/>
+    <EditText android:id="@+id/launcher_password_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:password="true"
+        android:hint="Password"/>
+    <Button android:id="@+id/launcher_login_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Login"/>
+    <ProgressBar android:id="@+id/launcher_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+    <TextView android:id="@+id/launcher_progress_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"/>
+</LinearLayout>
+</ScrollView>
+
