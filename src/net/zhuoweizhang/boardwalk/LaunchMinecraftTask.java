@@ -31,6 +31,7 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
 		// third, we take the version selected, download the version manifest, and use it to download libraries
 		// finally we use it to download Minecraft itself, and create a full dex.
 		// we return with the dex path to load, as well as the command line arguments to run MainActivity with.
+		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DEFAULT);
 		try {
 			setupWorkingDir(context);
 			forceDex = getLauncherDirVersion() != MY_VERSION || new File("/sdcard/boardwalk/dexme").exists();
@@ -76,7 +77,7 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
 	}
 
 	private MinecraftVersion getMinecraftVersion(String name) throws IOException {
-		return MinecraftDownloader.downloadVersionInfo(name);
+		return MinecraftDownloader.getVersionInfo(name);
 	}
 
 	private void downloadLibraries(MinecraftVersion version) throws Exception {

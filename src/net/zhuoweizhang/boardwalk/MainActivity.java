@@ -31,6 +31,8 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	private DisplayMetrics displayMetrics;
 	private static String[] libsToRename = {"vecmath", "testcases"};
 	private Button forwardButton, jumpButton, primaryButton, secondaryButton;
+	private Button debugButton, shiftButton;
+	private int scaleFactor = 1;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -42,6 +44,9 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		super.onCreate(savedInstanceState);
 		LaunchMinecraftTask.setupWorkingDir(this);
 		initEnvs();
+		if (DalvikTweaks.isDalvik()) {
+			DalvikTweaks.setDefaultStackSize(512 * 1024);
+		}
 		System.loadLibrary("glshim");
 
 		displayMetrics = new DisplayMetrics();
@@ -56,12 +61,14 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		jumpButton = findButton(R.id.control_jump);
 		primaryButton = findButton(R.id.control_primary);
 		secondaryButton = findButton(R.id.control_secondary);
+		debugButton = findButton(R.id.control_debug);
+		shiftButton = findButton(R.id.control_shift);
 
 		glSurfaceView = (GLSurfaceView) findViewById(R.id.main_gl_surface);
 		glSurfaceView.setOnTouchListener(new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent e) {
-				int x = (int) e.getX();
-				int y = glSurfaceView.getHeight() - (int) e.getY();
+				int x = ((int) e.getX()) / scaleFactor;
+				int y = (glSurfaceView.getHeight() - (int) e.getY()) / scaleFactor;
 				AndroidDisplay.mouseX = x;
 				AndroidDisplay.mouseY = y;
 				switch (e.getActionMasked()) {
@@ -86,8 +93,8 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			public void onDrawFrame(GL10 gl) {
 			}
 			public void onSurfaceCreated(GL10 gl, javax.microedition.khronos.egl.EGLConfig config) {
-				AndroidDisplay.windowWidth = glSurfaceView.getWidth();
-				AndroidDisplay.windowHeight = glSurfaceView.getHeight();
+				AndroidDisplay.windowWidth = glSurfaceView.getWidth() / scaleFactor;
+				AndroidDisplay.windowHeight = glSurfaceView.getHeight() / scaleFactor;
 				System.out.println("WidthHeight: " + AndroidDisplay.windowWidth + ":" + AndroidDisplay.windowHeight);
 				AndroidContextImplementation.context = EGL14.eglGetCurrentContext();
 				AndroidContextImplementation.display = EGL14.eglGetCurrentDisplay();
@@ -163,10 +170,14 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			sendMouseButton(0, isDown);
 		} else if (v == secondaryButton) {
 			sendMouseButton(1, isDown);
+		} else if (v == debugButton) {
+			sendKeyPress(Keyboard.KEY_F3, isDown);
+		} else if (v == shiftButton) {
+			sendKeyPress(Keyboard.KEY_LSHIFT, isDown);
 		} else {
 			return false;
 		}
-		return true;
+		return false;
 	}
 
 	private void sendKeyPress(int keyCode, boolean status) {

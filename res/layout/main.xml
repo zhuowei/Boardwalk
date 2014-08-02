@@ -25,6 +25,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Sec"/>
+        <Button android:id="@+id/control_debug"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Deb"/>
+        <Button android:id="@+id/control_shift"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sft"/>
     </LinearLayout>
 </FrameLayout>
 

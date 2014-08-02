@@ -187,7 +187,7 @@ public class MinecraftLaunch {
 
 	public static void runDex(List<File> dexInFiles, File dexOut, List<String> extraArgs) {
 		System.out.println("Running dex: " + dexInFiles + " out: " + dexOut);
-		String[] dexArgs = {"--dex", "--output=" + dexOut.getAbsolutePath()};
+		String[] dexArgs = {"--dex", "--debug", "--output=" + dexOut.getAbsolutePath()};
 		List<String> dexNewArgs = new ArrayList<String>(dexArgs.length + dexInFiles.size());
 		dexNewArgs.addAll(Arrays.asList(dexArgs));
 		if (extraArgs != null) dexNewArgs.addAll(extraArgs);
@@ -195,7 +195,8 @@ public class MinecraftLaunch {
 			dexNewArgs.add(f.getAbsolutePath());
 		}
 		try {
-			runExt("com.android.dx.command.Main", dexNewArgs);
+			runExt("net.zhuoweizhang.boardwalk.com.android.dx.command.Main", dexNewArgs);
+			//com.android.dx.command.Main.main(dexNewArgs.toArray(dexArgs));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -204,8 +205,9 @@ public class MinecraftLaunch {
 	public static void runExt(String className, List<String> args) throws IOException, InterruptedException {
 		List<String> argsNew = new ArrayList<String>();
 		argsNew.addAll(javaVMCmd);
-		//argsNew.add("-Xms384M");
+		argsNew.add("-Xms128M");
 		argsNew.add("-Xmx768M");
+		argsNew.add("-XX:HeapMaxFree=128M");
 		argsNew.add(className);
 		argsNew.addAll(args);
 		Process p = new ProcessBuilder(argsNew).redirectErrorStream(true).start();

@@ -1,0 +1,1 @@
+rule com.android.** net.zhuoweizhang.boardwalk.com.android.@1
