@@ -36,7 +36,8 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
 			setupWorkingDir(context);
 			forceDex = getLauncherDirVersion() != MY_VERSION || new File("/sdcard/boardwalk/dexme").exists();
 			// todo login
-			MinecraftVersion version = getMinecraftVersion("1.7.10");
+			MinecraftVersion version = getMinecraftVersion(MainActivity.VERSION_TO_LAUNCH);
+			System.out.println("Can use existing dex pack: " + MinecraftLaunch.canUseExistingDexPack(version));
 			if (forceDex || !MinecraftLaunch.canUseExistingDexPack(version)) {
 				populateWorkingDir();
 				downloadLibraries(version);

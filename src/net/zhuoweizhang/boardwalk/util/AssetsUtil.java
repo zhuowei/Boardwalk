@@ -8,7 +8,7 @@ public class AssetsUtil {
 
 	public static void extractDirFromAssets(Context context, String path, File outputDir) throws IOException {
 		AssetManager assets = context.getAssets();
-		byte[] buffer = new byte[0x2000];
+		byte[] buffer = new byte[0x4000];
 		String[] entries = assets.list(path);
 		extractDirImpl(assets, path, entries, outputDir, buffer);
 	}

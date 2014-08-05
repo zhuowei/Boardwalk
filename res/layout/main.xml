@@ -33,6 +33,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Sft"/>
+        <Button android:id="@+id/control_keyboard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kbd"/>
     </LinearLayout>
 </FrameLayout>
 

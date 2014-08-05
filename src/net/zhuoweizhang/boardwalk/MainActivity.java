@@ -8,9 +8,16 @@ import java.security.*;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.Selection;
+import android.text.Spannable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.*;
+import android.view.inputmethod.*;
 import android.widget.*;
 
 import dalvik.system.*;
@@ -18,6 +25,7 @@ import dalvik.system.*;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.AndroidContextImplementation;
 import org.lwjgl.opengl.AndroidDisplay;
+import org.lwjgl.opengl.AndroidKeyCodes;
 import android.opengl.*;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -27,12 +35,22 @@ import net.zhuoweizhang.boardwalk.util.*;
 
 public class MainActivity extends Activity implements View.OnTouchListener
 {
+	public static final String VERSION_TO_LAUNCH = "1.7.10";
+	public static final String initText = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
+					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ";
 	private GLSurfaceView glSurfaceView;
 	private DisplayMetrics displayMetrics;
 	private static String[] libsToRename = {"vecmath", "testcases"};
 	private Button forwardButton, jumpButton, primaryButton, secondaryButton;
 	private Button debugButton, shiftButton;
+	private Button keyboardButton;
 	private int scaleFactor = 1;
+	private PopupWindow hiddenTextWindow;
+	private TextView hiddenTextView;
+	private String hiddenTextContents = initText;
+	private boolean hiddenTextIgnoreUpdate = true;
+	public static final int KEY_BACKSPACE = 14; //WTF lwjgl?
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -63,6 +81,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		secondaryButton = findButton(R.id.control_secondary);
 		debugButton = findButton(R.id.control_debug);
 		shiftButton = findButton(R.id.control_shift);
+		keyboardButton = findButton(R.id.control_keyboard);
 
 		glSurfaceView = (GLSurfaceView) findViewById(R.id.main_gl_surface);
 		glSurfaceView.setOnTouchListener(new View.OnTouchListener() {
@@ -105,7 +124,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				System.out.println("Gave up context: " + AndroidContextImplementation.context);
 				//File dexOut = new File("/sdcard/boardwalk/testcases_final.jar");
 				//runCraft(dexOut);
-				runCraft2(MainActivity.this, "1.7.10");
+				runCraft2(MainActivity.this, VERSION_TO_LAUNCH);
 				while (true) {
 					try {
 						Thread.sleep(0x7fffffff);
@@ -174,6 +193,8 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			sendKeyPress(Keyboard.KEY_F3, isDown);
 		} else if (v == shiftButton) {
 			sendKeyPress(Keyboard.KEY_LSHIFT, isDown);
+		} else if (v == keyboardButton) {
+			showHiddenTextbox();
 		} else {
 			return false;
 		}
@@ -181,7 +202,11 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	}
 
 	private void sendKeyPress(int keyCode, boolean status) {
-		AndroidDisplay.setKey(keyCode, status);
+		sendKeyPress(keyCode, (char) 0, status);
+	}
+
+	private void sendKeyPress(int keyCode, char keyChar, boolean status) {
+		AndroidDisplay.setKey(keyCode, keyChar, status);
 	}
 
 	private void sendMouseButton(int button, boolean status) {
@@ -193,6 +218,11 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			sendKeyPress(Keyboard.KEY_ESCAPE, true);
 			return true;
 		}
+		Integer lwjglCode = AndroidKeyCodes.keyCodeMap.get(keyCode);
+		if (lwjglCode != null) {
+			sendKeyPress(lwjglCode, true);
+			return true;
+		}
 		return super.onKeyDown(keyCode, event);
 	}
 
@@ -201,7 +231,67 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			sendKeyPress(Keyboard.KEY_ESCAPE, false);
 			return true;
 		}
+		Integer lwjglCode = AndroidKeyCodes.keyCodeMap.get(keyCode);
+		if (lwjglCode != null) {
+			sendKeyPress(lwjglCode, false);
+			return true;
+		}
 		return super.onKeyDown(keyCode, event);
+	}
+
+	public void showHiddenTextbox() {
+		int IME_FLAG_NO_FULLSCREEN = 0x02000000;
+		hiddenTextIgnoreUpdate = true;
+		if (hiddenTextWindow == null) {
+			hiddenTextView = new EditText(this);
+			PopupTextWatcher whoWatchesTheWatcher = new PopupTextWatcher();
+			hiddenTextView.addTextChangedListener(whoWatchesTheWatcher);
+			hiddenTextView.setOnEditorActionListener(whoWatchesTheWatcher);
+			hiddenTextView.setSingleLine(true);
+			hiddenTextView.setImeOptions(EditorInfo.IME_ACTION_NEXT
+					| EditorInfo.IME_FLAG_NO_EXTRACT_UI | IME_FLAG_NO_FULLSCREEN);
+			hiddenTextView.setInputType(InputType.TYPE_CLASS_TEXT);
+			LinearLayout linearLayout = new LinearLayout(this);
+			linearLayout.addView(hiddenTextView);
+			hiddenTextWindow = new PopupWindow(linearLayout);
+			hiddenTextWindow.setWindowLayoutMode(ViewGroup.LayoutParams.WRAP_CONTENT,
+					ViewGroup.LayoutParams.WRAP_CONTENT);
+			hiddenTextWindow.setFocusable(true);
+			hiddenTextWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NEEDED);
+			hiddenTextWindow.setBackgroundDrawable(new ColorDrawable());
+			// To get back button handling for free
+			hiddenTextWindow.setClippingEnabled(false);
+			hiddenTextWindow.setTouchable(false);
+			hiddenTextWindow.setOutsideTouchable(true);
+			// These flags were taken from a dumpsys window output of Mojang's
+			// window
+			hiddenTextWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+				public void onDismiss() {
+					//nativeBackPressed();
+					hiddenTextIgnoreUpdate = true;
+				}
+			});
+		}
+
+		// yes, this is a kludge. Haters gonna hate.
+		hiddenTextView.setText(initText);
+		hiddenTextContents = hiddenTextView.getText().toString();
+		Selection.setSelection((Spannable) hiddenTextView.getText(), hiddenTextContents.length());
+		//this.hiddenTextDismissAfterOneLine = dismissAfterOneLine;
+
+		int xLoc = -10000;
+
+		hiddenTextWindow.showAtLocation(this.getWindow().getDecorView(),
+				Gravity.LEFT | Gravity.TOP, xLoc, 0);
+		hiddenTextView.requestFocus();
+		showKeyboardView();
+		hiddenTextIgnoreUpdate = false;
+	}
+
+
+	public void showKeyboardView() {
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.showSoftInput(getWindow().getDecorView(), InputMethodManager.SHOW_FORCED);
 	}
 
 	public static List<File> runRenameLibs(File rulesFile, List<File> inFiles) {
@@ -350,7 +440,12 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			optDir.mkdirs();
 			DexClassLoader classLoader = new DexClassLoader(MinecraftLaunch.getClassPath(version), 
 				optDir.getAbsolutePath(), "", MainActivity.class.getClassLoader());
-			Class<?> clazz = classLoader.loadClass("net.minecraft.client.main.Main");
+			Class<?> clazz = null;
+			try {
+				clazz = classLoader.loadClass("net.minecraft.client.main.Main");
+			} catch (ClassNotFoundException ex) {
+				clazz = classLoader.loadClass("net.minecraft.client.Minecraft");
+			}
 			Method mainMethod = clazz.getMethod("main", String[].class);
 			File gameDir = new File("/sdcard/boardwalk/gamedir");
 			gameDir.mkdirs();
@@ -361,7 +456,26 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			//testCase.run();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
-		}		
+		}
+	}
+
+	public static void forceUserHome(String s) throws Exception {
+		Properties props = System.getProperties();
+		Class clazz = props.getClass();
+		Field f = null;
+		while (clazz != null) {
+			try {
+				f = clazz.getDeclaredField("defaults");
+				break;
+			} catch (Exception e) {
+				clazz = clazz.getSuperclass();
+			}
+		}
+		if (f != null) {
+			f.setAccessible(true);
+			Properties defaultProps = (Properties) f.get(props);
+			defaultProps.put("user.home", s);
+		}
 	}
 
 	public static void initEnvs() {
@@ -372,8 +486,55 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			Class osClass = os.getClass();
 			Method setEnvMethod = osClass.getMethod("setenv", String.class, String.class, Boolean.TYPE);
 			setEnvMethod.invoke(os, "LIBGL_MIPMAP", "3", true);
+			System.setProperty("user.home", "/sdcard/boardwalk");
+			if (!System.getProperty("user.home", "/").equals("/sdcard/boardwalk")) {
+				forceUserHome("/sdcard/boardwalk");
+			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	private class PopupTextWatcher implements TextWatcher, TextView.OnEditorActionListener {
+		public void afterTextChanged(Editable e) {
+//			nativeSetTextboxText(e.toString());
+			if (hiddenTextIgnoreUpdate) return;
+			String newText = e.toString();
+			String oldText = hiddenTextContents;
+			System.out.println("New: " + newText + " old: " + oldText);
+			if (newText.length() < oldText.length()) {
+				for (int i = 0; i < oldText.length() - newText.length(); i++) {
+					sendKeyPress(KEY_BACKSPACE, true);
+					sendKeyPress(KEY_BACKSPACE, false);
+				}
+			} else {
+				for (int i = 0; i < newText.length() - oldText.length(); i++) {
+					int index = oldText.length() + i;
+					char keyChar = newText.charAt(index);
+					sendKeyPress(0, keyChar, true);
+					sendKeyPress(0, keyChar, false);
+				}
+			}
+			hiddenTextContents = newText;
+		}
+
+		public void beforeTextChanged(CharSequence c, int start, int count, int after) {
+		}
+
+		public void onTextChanged(CharSequence c, int start, int count, int after) {
+		}
+
+		public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+/*			if (BuildConfig.DEBUG)
+				Log.i(TAG, "Editor action: " + actionId);
+			if (hiddenTextDismissAfterOneLine) {
+				hiddenTextWindow.dismiss();
+			} else {
+				nativeReturnKeyPressed();
+			}
+			return true;
+*/
+			return true;
 		}
 	}
 
