@@ -46,6 +46,7 @@ public class MinecraftLaunch {
 	public static boolean canUseExistingDexPack(MinecraftVersion version) {
 		File versionFile = MinecraftDownloader.getMinecraftVersionFile(version);
 		File dexPack = getDexPackFile(version);
+		System.out.println("Dex pack: " + dexPack);
 		if (!dexPack.exists()) return false;
 		return !(versionFile.lastModified() > dexPack.lastModified()); //not newer
 	}
@@ -187,7 +188,7 @@ public class MinecraftLaunch {
 
 	public static void runDex(List<File> dexInFiles, File dexOut, List<String> extraArgs) {
 		System.out.println("Running dex: " + dexInFiles + " out: " + dexOut);
-		String[] dexArgs = {"--dex", "--debug", "--output=" + dexOut.getAbsolutePath()};
+		String[] dexArgs = {"--dex", "--output=" + dexOut.getAbsolutePath()};
 		List<String> dexNewArgs = new ArrayList<String>(dexArgs.length + dexInFiles.size());
 		dexNewArgs.addAll(Arrays.asList(dexArgs));
 		if (extraArgs != null) dexNewArgs.addAll(extraArgs);
@@ -195,8 +196,10 @@ public class MinecraftLaunch {
 			dexNewArgs.add(f.getAbsolutePath());
 		}
 		try {
+			System.gc();
 			runExt("net.zhuoweizhang.boardwalk.com.android.dx.command.Main", dexNewArgs);
 			//com.android.dx.command.Main.main(dexNewArgs.toArray(dexArgs));
+			System.out.println("Done executing dex");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

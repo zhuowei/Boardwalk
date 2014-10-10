@@ -38,6 +38,11 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	public static final String VERSION_TO_LAUNCH = "1.7.10";
 	public static final String initText = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
 					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ";
+
+	private static int[] hotbarKeys = {
+		Keyboard.KEY_1, Keyboard.KEY_2,	Keyboard.KEY_3,
+		Keyboard.KEY_4, Keyboard.KEY_5,	Keyboard.KEY_6,
+		Keyboard.KEY_7, Keyboard.KEY_8, Keyboard.KEY_9};
 	private GLSurfaceView glSurfaceView;
 	private DisplayMetrics displayMetrics;
 	private static String[] libsToRename = {"vecmath", "testcases"};
@@ -49,6 +54,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	private TextView hiddenTextView;
 	private String hiddenTextContents = initText;
 	private boolean hiddenTextIgnoreUpdate = true;
+	private int guiScale = 1;
 	public static final int KEY_BACKSPACE = 14; //WTF lwjgl?
 
 	/** Called when the activity is first created. */
@@ -88,6 +94,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			public boolean onTouch(View v, MotionEvent e) {
 				int x = ((int) e.getX()) / scaleFactor;
 				int y = (glSurfaceView.getHeight() - (int) e.getY()) / scaleFactor;
+				if (handleGuiBar(x, y, e)) return true;
 				AndroidDisplay.mouseX = x;
 				AndroidDisplay.mouseY = y;
 				switch (e.getActionMasked()) {
@@ -114,6 +121,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			public void onSurfaceCreated(GL10 gl, javax.microedition.khronos.egl.EGLConfig config) {
 				AndroidDisplay.windowWidth = glSurfaceView.getWidth() / scaleFactor;
 				AndroidDisplay.windowHeight = glSurfaceView.getHeight() / scaleFactor;
+				calculateMcScale();
 				System.out.println("WidthHeight: " + AndroidDisplay.windowWidth + ":" + AndroidDisplay.windowHeight);
 				AndroidContextImplementation.context = EGL14.eglGetCurrentContext();
 				AndroidContextImplementation.display = EGL14.eglGetCurrentDisplay();
@@ -237,6 +245,59 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+
+	public void calculateMcScale() {
+		// mojang's scaling algorithm:
+		// keep increasing scale factor when
+		// currentscale factor is below the maximum
+		// next scale factor when applied gives an effective area greater than 320x240
+		// if rendering unicode and on an odd scale factor
+		// decrease scale factor
+		int scale = 1;
+		int screenWidth = AndroidDisplay.windowWidth;
+		int screenHeight = AndroidDisplay.windowHeight;
+
+		while(screenWidth / (scale + 1) >= 320 && screenHeight / (scale + 1) >= 240) {
+			scale++;
+		}
+		// we can't deal with Unicode here.
+		this.guiScale = scale;
+	}
+
+	public int mcscale(int input) {
+		return input * guiScale;
+	}
+
+	public boolean handleGuiBar(int x, int y, MotionEvent e) {
+		//if (!AndroidDisplay.grab) return false;
+		boolean isDown;
+		switch (e.getActionMasked()) {
+			case MotionEvent.ACTION_DOWN:
+			case MotionEvent.ACTION_POINTER_DOWN:
+				isDown = true;
+				break;
+			case MotionEvent.ACTION_UP:
+			case MotionEvent.ACTION_POINTER_UP:
+			case MotionEvent.ACTION_CANCEL:
+				isDown = false;
+				break;
+			default:
+				return false;
+		}
+		int screenWidth = AndroidDisplay.windowWidth;
+		int screenHeight = AndroidDisplay.windowHeight;
+		int barheight = mcscale(20);
+		int barwidth = mcscale(180);
+		int barx = (screenWidth / 2) - (barwidth / 2);
+		int bary = 0;
+		System.out.println("Gui bar: " + barx + ":" + bary + ": my " + x + ":" + y);
+		if (x < barx || x >= barx + barwidth || y < bary || y >= bary + barheight) {
+			return false;
+		}
+		int icon = ((x - barx) / mcscale(180 / 9)) % 9;
+		sendKeyPress(hotbarKeys[icon], isDown);
+		return true;
 	}
 
 	public void showHiddenTextbox() {
@@ -490,6 +551,10 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			if (!System.getProperty("user.home", "/").equals("/sdcard/boardwalk")) {
 				forceUserHome("/sdcard/boardwalk");
 			}
+			System.setProperty("org.apache.logging.log4j.level", "INFO");
+			// this one is for the API's built in logger; we only use this one,
+			// but we set the one above also, just in case.
+			System.setProperty("org.apache.logging.log4j.simplelog.level", "INFO");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
