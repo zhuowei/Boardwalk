@@ -9,12 +9,15 @@
     <EditText android:id="@+id/launcher_username_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:hint="Username"/>
+        android:singleLine="true"
+        android:hint="@string/login_username_hint"
+        android:inputType="textEmailAddress"/>
     <EditText android:id="@+id/launcher_password_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:password="true"
-        android:hint="Password"/>
+        android:singleLine="true"
+        android:hint="@string/login_password_hint"/>
     <Button android:id="@+id/launcher_login_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
