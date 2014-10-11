@@ -8,6 +8,7 @@ import java.security.*;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
@@ -88,6 +89,8 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		debugButton = findButton(R.id.control_debug);
 		shiftButton = findButton(R.id.control_shift);
 		keyboardButton = findButton(R.id.control_keyboard);
+
+		registerShutdownHook();
 
 		glSurfaceView = (GLSurfaceView) findViewById(R.id.main_gl_surface);
 		glSurfaceView.setOnTouchListener(new View.OnTouchListener() {
@@ -353,6 +356,20 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	public void showKeyboardView() {
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.showSoftInput(getWindow().getDecorView(), InputMethodManager.SHOW_FORCED);
+	}
+
+	private void registerShutdownHook() {
+		Thread shutdownThread = new Thread(new Runnable() {
+			public void run() {
+				// start the post-exit activity
+				if (isConnected()) startActivity(new Intent(MainActivity.this, PostExitActivity.class));
+			}
+		});
+		Runtime.getRuntime().addShutdownHook(shutdownThread);
+	}
+
+	public boolean isConnected() {
+		return true;
 	}
 
 	public static List<File> runRenameLibs(File rulesFile, List<File> inFiles) {
