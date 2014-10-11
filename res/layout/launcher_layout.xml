@@ -15,13 +15,13 @@
     <EditText android:id="@+id/launcher_password_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:password="true"
         android:singleLine="true"
-        android:hint="@string/login_password_hint"/>
+        android:hint="@string/login_password_hint"
+        android:inputType="textPassword"/>
     <Button android:id="@+id/launcher_login_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Login"/>
+        android:text="@string/login_button"/>
     <Button android:id="@+id/launcher_play_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

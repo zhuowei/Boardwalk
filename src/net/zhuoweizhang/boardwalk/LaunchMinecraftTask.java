@@ -66,7 +66,7 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
 	}
 
 	private void populateWorkingDir() throws IOException {
-		publishProgress("Populating working directory");
+		publishProgress(context.getResources().getString(R.string.convert_populating_working_directory));
 		File dexLibDir = MinecraftLaunch.dexDir;
 		if (forceDex) {
 			IoUtil.clearDirectory(dexLibDir);
@@ -86,7 +86,7 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
 			String[] parts = library.name.split(":");
 			if (LibrariesRepository.needsDownload(parts[0], parts[1], parts[2])) {
 				try {
-					publishProgress("Downloading " + library.name);
+					publishProgress(context.getResources().getString(R.string.convert_downloading) + " " + library.name);
 					MinecraftDownloader.downloadLibrary(library);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -101,7 +101,7 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
 			if (localDexPath != null) {
 				continue;
 			}
-			publishProgress("Converting " + library.name);
+			publishProgress(context.getResources().getString(R.string.convert_converting) + " " + library.name);
 			File outputPath = LibrariesRepository.getDexTargetPath(parts[0], parts[1], parts[2]);
 			MinecraftLaunch.runConvert(localPath, outputPath, MinecraftLaunch.libsToRename.contains(parts[1]));
 		}
@@ -110,17 +110,17 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
 	private void downloadMinecraft(MinecraftVersion version) throws Exception {
 		File minecraftJar = MinecraftDownloader.getMinecraftVersionFile(version);
 		if (!minecraftJar.exists()) {
-			publishProgress("Downloading Minecraft " + version.id);
+			publishProgress(context.getResources().getString(R.string.convert_downloading) + " Minecraft " + version.id);
 			MinecraftDownloader.downloadMinecraftVersion(version);
 		}
 		if (forceDex || !MinecraftLaunch.canUseExistingDexPack(version)) {
-			publishProgress("Converting Minecraft " + version.id);
+			publishProgress(context.getResources().getString(R.string.convert_converting) + " Minecraft " + version.id);
 			MinecraftLaunch.createDexPack(version);
 		}
 	}
 
 	private void dexOptMinecraft(MinecraftVersion version) {
-		publishProgress("Preparing to load Minecraft");
+		publishProgress(context.getResources().getString(R.string.convert_preparing_to_launch_minecraft));
 		File optDir = context.getDir("dalvik-cache", 0);
 		optDir.mkdirs();
 		DexClassLoader classLoader = new DexClassLoader(MinecraftLaunch.getClassPath(version), 

@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
     <net.zhuoweizhang.boardwalk.BoardwalkGLSurfaceView android:id="@+id/main_gl_surface"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"/>
     <LinearLayout android:id="@+id/main_control_overlay"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:alpha="0.7">
         <Button android:id="@+id/control_forward"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,4 +44,4 @@
             android:layout_height="wrap_content"
             android:text="Tlk"/>
     </LinearLayout>
-</FrameLayout>
+</merge>

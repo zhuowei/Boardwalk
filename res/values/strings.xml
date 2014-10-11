@@ -4,8 +4,9 @@
     <string name="login_username_hint">Username or Mojang account e-mail</string>
     <string name="login_password_hint">Password</string>
     <string name="login_is_demo_account">This account doesn\'t seems to have a Minecraft user linked to it. Did you buy Minecraft? You can play the Demo version with the "Play Demo" button below.</string>
-    <string name="login_logging_in">Logging in...</string>
+    <string name="login_logging_in">Logging in&#8230;</string>
     <string name="login_error">Unable to login:</string>
+    <string name="login_button">Login</string>
 
     <string name="play_offline">Play Offline</string>
     <string name="play_demo">Play Demo</string>
@@ -13,4 +14,5 @@
     <string name="convert_populating_working_directory">Populating working directory</string>
     <string name="convert_downloading">Downloading</string>
     <string name="convert_converting">Converting</string>
+    <string name="convert_preparing_to_launch_minecraft">Preparing to launch Minecraft</string>
 </resources>
