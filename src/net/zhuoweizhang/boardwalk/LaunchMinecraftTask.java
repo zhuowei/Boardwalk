@@ -73,6 +73,8 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
 			AssetsUtil.extractDirFromAssets(context, "dexed_libraries", dexLibDir);
 			AssetsUtil.extractFileFromAssets(context, "jarjarrules.txt", new File(MinecraftLaunch.launcherDir,
 				"jarjarrules.txt"));
+			AssetsUtil.extractFileFromAssets(context, "jarjarrules_minecraft.txt", new File(MinecraftLaunch.launcherDir,
+				"jarjarrules_minecraft.txt"));
 			writeLauncherDirVersion();
 		}
 	}
@@ -103,7 +105,7 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
 			}
 			publishProgress(context.getResources().getString(R.string.convert_converting) + " " + library.name);
 			File outputPath = LibrariesRepository.getDexTargetPath(parts[0], parts[1], parts[2]);
-			MinecraftLaunch.runConvert(localPath, outputPath, MinecraftLaunch.libsToRename.contains(parts[1]));
+			MinecraftLaunch.runConvert(localPath, outputPath, MinecraftLaunch.libsToRename.contains(parts[1]), null);
 		}
 	}
 

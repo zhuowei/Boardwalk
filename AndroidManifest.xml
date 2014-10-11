@@ -26,5 +26,12 @@
             </intent-filter>
         </activity>
         <activity android:name="PostExitActivity" android:process=":SecondaryProcess"/>
+        <activity android:name="NerdyStuffActivity"
+            android:label="BoredNerd">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
+        </activity>
     </application>
 </manifest> 

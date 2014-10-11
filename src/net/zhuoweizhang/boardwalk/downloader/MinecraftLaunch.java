@@ -60,7 +60,7 @@ public class MinecraftLaunch {
 		File dexPack = getDexPackFile(version);
 		File dexPackTemp = File.createTempFile(dexPack.getName(), ".jar", tmpDir);
 		dexPack.getParentFile().mkdirs();
-		runConvert(minecraftJar, dexPackTemp, true);
+		runConvert(minecraftJar, dexPackTemp, true, "jarjarrules_minecraft.txt");
 
 		/*List<File> dexedLibs = getDexedLibsForVersion(version);
 		dexedLibs.add(mcDexedJarTemp);
@@ -145,21 +145,22 @@ public class MinecraftLaunch {
 				continue;
 			}
 			File outputPath = LibrariesRepository.getDexTargetPath(parts[0], parts[1], parts[2]);
-			runConvert(localPath, outputPath, libsToRename.contains(parts[1]));
+			runConvert(localPath, outputPath, libsToRename.contains(parts[1]), null);
 		}
 		
 	}
 
-	public static void runConvert(File input, File output, boolean rename) throws Exception {
+	public static void runConvert(File input, File output, boolean rename, String renameRules) throws Exception {
 		// run Jarjar
 		// run Dex
+		if (renameRules == null) renameRules = "jarjarrules.txt";
 		output.getParentFile().mkdirs();
 		File renamed = null;
 		if (rename) renamed = File.createTempFile(input.getName(), "renamed.jar", tmpDir);
 		File dexed = File.createTempFile(input.getName(), "dexed.jar", tmpDir);
 		try {
 			if (rename) {
-				runRename(new File(launcherDir, "jarjarrules.txt"), input, renamed);
+				runRename(new File(launcherDir, renameRules), input, renamed);
 				runDex(Arrays.asList(renamed), dexed);
 			} else {
 				runDex(Arrays.asList(input), dexed);

@@ -3,3 +3,5 @@ cd testcases
 cd ..
 cp -r predex_out/dexed_libraries assets/
 cp predex_out/jarjarrules.txt assets/
+cp assets/jarjarrules.txt assets/jarjarrules_minecraft.txt
+echo "rule java.util.PriorityQueue net.zhuoweizhang.makeshift.java.util.PriorityQueue" >>assets/jarjarrules_minecraft.txt
