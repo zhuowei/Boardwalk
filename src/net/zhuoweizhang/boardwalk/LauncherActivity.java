@@ -12,6 +12,8 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	public Button loginButton;
 	public TextView progressText;
 	public ProgressBar progressBar;
+	public Button playButton;
+	public boolean refreshedToken = false;
 
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -22,6 +24,8 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		progressText = (TextView) findViewById(R.id.launcher_progress_text);
 		progressBar = (ProgressBar) findViewById(R.id.launcher_progress_bar);
 		loginButton.setOnClickListener(this);
+		playButton = (Button) findViewById(R.id.launcher_play_button);
+		playButton.setOnClickListener(this);
 		updateUiWithLoginStatus();
 	}
 
@@ -42,20 +46,26 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		boolean loggedIn = isLoggedIn();
 		usernameText.setEnabled(!loggedIn);
 		passwordText.setVisibility(loggedIn? View.GONE: View.VISIBLE);
-		//offlineButton.setText(getResources().getText(loggedIn? R.string.play_offline : R.string.play_demo));
+		playButton.setText(getResources().getText(loggedIn? (refreshedToken? R.string.play_regular : R.string.play_offline)
+			: R.string.play_demo));
 		loginButton.setVisibility(loggedIn? View.GONE: View.VISIBLE);
 	}
 
 	public void onClick(View v) {
 		if (v == loginButton) {
 			doLogin();
+		} else if (v == playButton) {
+			doLaunch();
 		}
 	}
 
 	public void doLogin() {
-		progressBar.setVisibility(View.VISIBLE);
-		//new LaunchMinecraftTask(this, this).execute();
 		new LoginTask(this).execute(usernameText.getText().toString(), passwordText.getText().toString());
+	}
+
+	public void doLaunch() {
+		progressBar.setVisibility(View.VISIBLE);
+		new LaunchMinecraftTask(this, this).execute();
 	}
 
 	public void onProgressUpdate(String s) {

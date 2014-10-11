@@ -9,6 +9,7 @@ import java.security.*;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
@@ -50,6 +51,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	private Button forwardButton, jumpButton, primaryButton, secondaryButton;
 	private Button debugButton, shiftButton;
 	private Button keyboardButton;
+	private Button inventoryButton, talkButton;
 	private int scaleFactor = 1;
 	private PopupWindow hiddenTextWindow;
 	private TextView hiddenTextView;
@@ -89,6 +91,8 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		debugButton = findButton(R.id.control_debug);
 		shiftButton = findButton(R.id.control_shift);
 		keyboardButton = findButton(R.id.control_keyboard);
+		inventoryButton = findButton(R.id.control_inventory);
+		talkButton = findButton(R.id.control_talk);
 
 		registerShutdownHook();
 
@@ -191,7 +195,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			default:
 				return false;
 		}
-		System.out.println("Button: " + isDown + ":" + v);
+		if (BuildConfig.DEBUG) System.out.println("Button: " + isDown + ":" + v);
 		if (v == forwardButton) {
 			sendKeyPress(Keyboard.KEY_W, isDown);
 		} else if (v == jumpButton) {
@@ -204,6 +208,10 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			sendKeyPress(Keyboard.KEY_F3, isDown);
 		} else if (v == shiftButton) {
 			sendKeyPress(Keyboard.KEY_LSHIFT, isDown);
+		} else if (v == inventoryButton) {
+			sendKeyPress(Keyboard.KEY_E, isDown);
+		} else if (v == talkButton) {
+			sendKeyPress(Keyboard.KEY_T, isDown);
 		} else if (v == keyboardButton) {
 			showHiddenTextbox();
 		} else {
@@ -294,7 +302,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		int barwidth = mcscale(180);
 		int barx = (screenWidth / 2) - (barwidth / 2);
 		int bary = 0;
-		System.out.println("Gui bar: " + barx + ":" + bary + ": my " + x + ":" + y);
+		if (BuildConfig.DEBUG) System.out.println("Gui bar: " + barx + ":" + bary + ": my " + x + ":" + y);
 		if (x < barx || x >= barx + barwidth || y < bary || y >= bary + barheight) {
 			return false;
 		}
@@ -525,10 +533,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				clazz = classLoader.loadClass("net.minecraft.client.Minecraft");
 			}
 			Method mainMethod = clazz.getMethod("main", String[].class);
-			File gameDir = new File("/sdcard/boardwalk/gamedir");
-			gameDir.mkdirs();
-			String[] myargs = {"--accessToken", "0", "--userProperties", "{}", "--version", "mcp",
-				"--gameDir", gameDir.getAbsolutePath()};
+			String[] myargs = buildMCArgs(context, versionName);
 			mainMethod.invoke(null, (Object) myargs);
 			//junit.framework.TestCase testCase = (junit.framework.TestCase) clazz.newInstance();
 			//testCase.run();
@@ -575,6 +580,26 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private static String[] buildMCArgs(Context context, String versionName) {
+		File gameDir = new File("/sdcard/boardwalk/gamedir");
+		gameDir.mkdirs();
+		File assetsDir = new File(gameDir, "assets");
+		assetsDir.mkdirs();
+		SharedPreferences prefs = context.getSharedPreferences("launcher_prefs", 0);
+		String accessToken = prefs.getString("auth_accessToken", "0");
+		String userUUID = prefs.getString("auth_profile_id", "00000000-0000-0000-0000-000000000000");
+		boolean demo = userUUID.equals("00000000-0000-0000-0000-000000000000");
+		String username = prefs.getString("auth_profile_name", "Player");
+		String userType = demo? "legacy" : "mojang"; // Only demo uses non-Yggdrasil auth, it seems
+		List<String> retval = new ArrayList(Arrays.asList(
+			"--username", username, "--version", versionName, "--gameDir", gameDir.getAbsolutePath(),
+			"--assetsDir", assetsDir.getAbsolutePath(), "--assetIndex", versionName, "--uuid", userUUID,
+			"--accessToken", accessToken, "--userProperties", "{}", "--userType", userType
+			));
+		if (demo) retval.add("--demo");
+		return retval.toArray(new String[0]);
 	}
 
 	private class PopupTextWatcher implements TextWatcher, TextView.OnEditorActionListener {

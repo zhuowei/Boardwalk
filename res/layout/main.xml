@@ -37,6 +37,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Kbd"/>
+        <Button android:id="@+id/control_inventory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Inv"/>
+        <Button android:id="@+id/control_talk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tlk"/>
     </LinearLayout>
 </FrameLayout>
-
