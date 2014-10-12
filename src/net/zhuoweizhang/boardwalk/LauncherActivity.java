@@ -1,10 +1,14 @@
 package net.zhuoweizhang.boardwalk;
 
+import java.io.File;
+
 import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
+
+import net.zhuoweizhang.boardwalk.util.PlatformUtils;
 
 public class LauncherActivity extends Activity implements View.OnClickListener, LaunchMinecraftTask.Listener {
 
@@ -13,6 +17,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	public TextView progressText;
 	public ProgressBar progressBar;
 	public Button playButton;
+	public TextView recommendationText;
 	public boolean refreshedToken = false;
 
 	public void onCreate(Bundle icicle) {
@@ -26,7 +31,9 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		loginButton.setOnClickListener(this);
 		playButton = (Button) findViewById(R.id.launcher_play_button);
 		playButton.setOnClickListener(this);
+		recommendationText = (TextView) findViewById(R.id.launcher_recommendation_text);
 		updateUiWithLoginStatus();
+		updateRecommendationText();
 	}
 
 	@Override
@@ -74,5 +81,19 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 
 	public boolean isLoggedIn() {
 		return getSharedPreferences("launcher_prefs", 0).getString("auth_accessToken", null) != null;
+	}
+
+	public void updateRecommendationText() {
+		StringBuilder builder = new StringBuilder();
+		if (PlatformUtils.getNumCores() < 2) {
+			builder.append(getResources().getText(R.string.recommendation_dual_core)).append("\n");
+		}
+		if (PlatformUtils.getTotalMemory() < (900000L * 1024L)) { // 900MB
+			builder.append(getResources().getText(R.string.recommendation_memory)).append("\n");
+		}
+		if (DalvikTweaks.isDalvik() && new File("/system/lib/libart.so").exists()) {
+			builder.append(getResources().getText(R.string.recommendation_art)).append("\n");
+		}
+		recommendationText.setText(builder.toString());
 	}
 }

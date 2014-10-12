@@ -8,6 +8,10 @@
     <string name="login_error">Unable to login:</string>
     <string name="login_button">Login</string>
 
+    <string name="recommendation_art">Your device supports the Android Runtime (ART), which may be able to run Minecraft faster. You can switch to ART by going to Settings, then Developer Settings, then Select Runtime, and finally select Use ART.\n(Other applications may not be ART compatiable, so you might want to switch back to Dalvik when not using Boardwalk.)</string>
+    <string name="recommendation_memory">Unfortunately, your device is not supported, as this application requires 1GB of memory to convert Minecraft for Android. The application may force close if you try to launch.</string>
+    <string name="recommendation_dual_core">Unfortunately, your device is not supported, as this application requires a dual-core CPU or better. Otherwise, the application will run very slowly.</string>
+
     <string name="play_offline">Play Offline</string>
     <string name="play_demo">Play Demo</string>
     <string name="play_regular">Launch Minecraft</string>
