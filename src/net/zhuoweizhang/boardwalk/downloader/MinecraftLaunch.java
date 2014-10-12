@@ -184,7 +184,9 @@ public class MinecraftLaunch {
 	}
 
 	public static void runDex(List<File> dexInFiles, File dexOut) {
-		runDex(dexInFiles, dexOut, Arrays.asList("--num-threads=4", "--no-optimize"));
+		List<String> dexArgs = Arrays.asList("--num-threads=4", "--no-optimize");
+		if (!javaVMCmd.get(0).equals("dalvikvm")) dexArgs = Arrays.asList("--num-threads=4");
+		runDex(dexInFiles, dexOut, dexArgs);
 	}
 
 	public static void runDex(List<File> dexInFiles, File dexOut, List<String> extraArgs) {
@@ -211,7 +213,7 @@ public class MinecraftLaunch {
 		argsNew.addAll(javaVMCmd);
 		argsNew.add("-Xms128M");
 		argsNew.add("-Xmx768M");
-		argsNew.add("-XX:HeapMaxFree=128M");
+		if (javaVMCmd.get(0).equals("dalvikvm")) argsNew.add("-XX:HeapMaxFree=128M");
 		argsNew.add(className);
 		argsNew.addAll(args);
 		Process p = new ProcessBuilder(argsNew).redirectErrorStream(true).start();

@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <com.google.android.gms.ads.AdView android:id="@+id/ad"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_alignParentBottom="true"
+                           ads:adSize="SMART_BANNER"
+                           ads:adUnitId="ca-app-pub-2652482030334356/2515145429"/>
+<ScrollView
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    >
+    android:layout_above="@id/ad">
 <LinearLayout android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
@@ -22,6 +33,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/login_button"/>
+    <Button android:id="@+id/launcher_logout_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Log out"/>
     <Button android:id="@+id/launcher_play_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -36,6 +51,10 @@
     <TextView android:id="@+id/launcher_progress_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/launcher_extra_info_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/login_extra_info_text"/>
 </LinearLayout>
 </ScrollView>
-
+</RelativeLayout>

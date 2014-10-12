@@ -7,6 +7,10 @@
     <string name="login_logging_in">Logging in&#8230;</string>
     <string name="login_error">Unable to login:</string>
     <string name="login_button">Login</string>
+    <string name="login_extra_info_text">This application is not in any way affiliated with Mojang AB.\n
+This version of Boardwalk is very experimental - world generation may take up to 5 minutes, and multiplayer only works on offline servers.\n
+These issues are being investigated and might be fixed in a later version.
+</string>
 
     <string name="recommendation_art">Your device supports the Android Runtime (ART), which may be able to run Minecraft faster. You can switch to ART by going to Settings, then Developer Settings, then Select Runtime, and finally select Use ART.\n(Other applications may not be ART compatiable, so you might want to switch back to Dalvik when not using Boardwalk.)</string>
     <string name="recommendation_memory">Unfortunately, your device is not supported, as this application requires 1GB of memory to convert Minecraft for Android. The application may force close if you try to launch.</string>

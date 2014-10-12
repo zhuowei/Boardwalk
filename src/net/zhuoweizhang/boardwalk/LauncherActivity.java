@@ -8,6 +8,8 @@ import android.os.*;
 import android.view.*;
 import android.widget.*;
 
+import com.google.android.gms.ads.*;
+
 import net.zhuoweizhang.boardwalk.util.PlatformUtils;
 
 public class LauncherActivity extends Activity implements View.OnClickListener, LaunchMinecraftTask.Listener {
@@ -19,6 +21,10 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	public Button playButton;
 	public TextView recommendationText;
 	public boolean refreshedToken = true; // TODO false;
+	public boolean isLaunching = false;
+	public Button logoutButton;
+
+	private AdView adView;
 
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -32,8 +38,11 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		playButton = (Button) findViewById(R.id.launcher_play_button);
 		playButton.setOnClickListener(this);
 		recommendationText = (TextView) findViewById(R.id.launcher_recommendation_text);
+		logoutButton = (Button) findViewById(R.id.launcher_logout_button);
+		logoutButton.setOnClickListener(this);
 		updateUiWithLoginStatus();
 		updateRecommendationText();
+		initAds();
 	}
 
 	@Override
@@ -56,6 +65,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		playButton.setText(getResources().getText(loggedIn? (refreshedToken? R.string.play_regular : R.string.play_offline)
 			: R.string.play_demo));
 		loginButton.setVisibility(loggedIn? View.GONE: View.VISIBLE);
+		logoutButton.setVisibility(loggedIn? View.VISIBLE: View.GONE);
 	}
 
 	public void onClick(View v) {
@@ -63,6 +73,8 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			doLogin();
 		} else if (v == playButton) {
 			doLaunch();
+		} else if (v == logoutButton) {
+			doLogout();
 		}
 	}
 
@@ -71,7 +83,13 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	}
 
 	public void doLaunch() {
+		isLaunching = true;
+		adView.pause();
+		adView.setVisibility(View.GONE);
 		progressBar.setVisibility(View.VISIBLE);
+		loginButton.setVisibility(View.GONE);
+		logoutButton.setVisibility(View.GONE);
+		playButton.setVisibility(View.GONE);
 		new LaunchMinecraftTask(this, this).execute();
 	}
 
@@ -95,5 +113,38 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			builder.append(getResources().getText(R.string.recommendation_art)).append("\n");
 		}
 		recommendationText.setText(builder.toString());
+	}
+
+	private void initAds() {
+		adView = (AdView) findViewById(R.id.ad);
+		AdRequest adRequest = new AdRequest.Builder()
+			.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER)
+			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER_L)
+			.build();
+		adView.loadAd(adRequest);
+	}
+
+	public void onBackPressed() {
+		if (isLaunching) return;
+		super.onBackPressed();
+	}
+
+	private void doLogout() {
+		getSharedPreferences("launcher_prefs", 0).edit().
+			remove("auth_accessToken").
+			remove("auth_profile_name").
+			remove("auth_profile_id").
+			apply();
+		updateUiWithLoginStatus();
+	}
+
+	public void onLaunchError() {
+		isLaunching = false;
+		playButton.setVisibility(View.VISIBLE);
+		adView.resume();
+		adView.setVisibility(View.VISIBLE);
+		progressBar.setVisibility(View.GONE);
+		updateUiWithLoginStatus();
 	}
 }

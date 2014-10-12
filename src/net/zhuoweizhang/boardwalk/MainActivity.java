@@ -469,12 +469,12 @@ public class MainActivity extends Activity implements View.OnTouchListener
 
 	public static void fixRSAPadding(File spongyFile, File optDir) throws Exception {
 		// welcome to the territory of YOLO; I'll be your tour guide for today.
-		System.out.println("Before: " + KeyFactory.getInstance("RSA"));
+		System.out.println("Before: " + KeyFactory.getInstance("RSA") + ":" + KeyFactory.getInstance("RSA").getProvider());
 		DexClassLoader classLoader = new DexClassLoader(spongyFile.getAbsolutePath(),
 			optDir.getAbsolutePath(), null, MainActivity.class.getClassLoader());
 		Class<?> clazz = classLoader.loadClass("org.spongycastle.jce.provider.BouncyCastleProvider");
 		Security.insertProviderAt((Provider) clazz.newInstance(), 1);
-		System.out.println("After: " + KeyFactory.getInstance("RSA"));
+		System.out.println("After: " + KeyFactory.getInstance("RSA") + ":" + KeyFactory.getInstance("RSA").getProvider());
 /*		KeyFactory.getInstance("RSA");
 		Class<?> clazz = Class.forName("org.apache.harmony.security.fortress.Services");
 		Method method = clazz.getMethod("getServices", String.class);
@@ -523,6 +523,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			optDir.mkdirs();
 			DexClassLoader classLoader = new DexClassLoader(MinecraftLaunch.getClassPath(version), 
 				optDir.getAbsolutePath(), "", MainActivity.class.getClassLoader());
+
 			Class<?> clazz = null;
 			try {
 				clazz = classLoader.loadClass("net.minecraft.client.main.Main");
@@ -595,7 +596,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			"--assetsDir", assetsDir.getAbsolutePath(), "--assetIndex", versionName, "--uuid", userUUID,
 			"--accessToken", accessToken, "--userProperties", "{}", "--userType", userType
 			));
-		//if (demo) retval.add("--demo");
+		if (demo) retval.add("--demo");
 		return retval.toArray(new String[0]);
 	}
 

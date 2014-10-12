@@ -12,7 +12,7 @@ import net.zhuoweizhang.boardwalk.downloader.*;
 import net.zhuoweizhang.boardwalk.model.*;
 import net.zhuoweizhang.boardwalk.util.*;
 
-public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
+public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 
 	public static final int MY_VERSION = 1;
 
@@ -25,7 +25,7 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
 		this.listener = listener;
 	}
 
-	public Void doInBackground(Void... params) {
+	public String doInBackground(Void... params) {
 		// first, we extract our own dex files.
 		// second, we fetch the login lib, rename it, load it, and use it to auth.
 		// third, we take the version selected, download the version manifest, and use it to download libraries
@@ -47,7 +47,9 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
 			extractDefaultOptions();
 		} catch (Exception e) {
 			e.printStackTrace();
+			return e.toString();
 		}
+		System.gc();
 		return null;
 	}
 
@@ -145,15 +147,22 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
 	}
 
 	protected void onProgressUpdate(String... progress) {
-		listener.onProgressUpdate(progress[0]);
+		listener.onProgressUpdate("Installing - this should take about 4 minutes. " +
+			"Please don't leave this application during the install process. " + progress[0]);
 	}
 
-	protected void onPostExecute(Void result) {
-		context.startActivity(new Intent(context, MainActivity.class));
+	protected void onPostExecute(String result) {
+		if (result != null) {
+			listener.onProgressUpdate("Error: " + result);
+			listener.onLaunchError();
+		} else {
+			context.startActivity(new Intent(context, MainActivity.class));
+		}
 	}
 
 	public static interface Listener {
 		public void onProgressUpdate(String s);
+		public void onLaunchError();
 	}
 
 }

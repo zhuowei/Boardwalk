@@ -6,4 +6,3 @@ maxFps:260
 fancyGraphics:false
 fullscreen:true
 enableVsync:false
-touchscreen:true

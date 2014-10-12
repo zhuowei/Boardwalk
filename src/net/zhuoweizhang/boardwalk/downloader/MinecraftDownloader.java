@@ -59,7 +59,7 @@ public class MinecraftDownloader {
 	public static String getLibraryDownloadUrl(String group, String artifact, String version) {
 		String path = LibrariesRepository.artifactToPath(group, artifact, version);
 		if (useMavenCentral) {
-			return "http://search.maven.org/remotecontent?filepath=" + path;
+			return "https://repo1.maven.org/maven2/" + path;
 		}
 		return "https://libraries.minecraft.net/" + path;
 	}
