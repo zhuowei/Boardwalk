@@ -369,14 +369,12 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		Thread shutdownThread = new Thread(new Runnable() {
 			public void run() {
 				// start the post-exit activity
-				if (isConnected()) startActivity(new Intent(MainActivity.this, PostExitActivity.class));
+				if (DroidUtil.isConnected(MainActivity.this)) {
+					startActivity(new Intent(MainActivity.this, PostExitActivity.class));
+				}
 			}
 		});
 		Runtime.getRuntime().addShutdownHook(shutdownThread);
-	}
-
-	public boolean isConnected() {
-		return true;
 	}
 
 	public static List<File> runRenameLibs(File rulesFile, List<File> inFiles) {
@@ -597,7 +595,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			"--assetsDir", assetsDir.getAbsolutePath(), "--assetIndex", versionName, "--uuid", userUUID,
 			"--accessToken", accessToken, "--userProperties", "{}", "--userType", userType
 			));
-		if (demo) retval.add("--demo");
+		//if (demo) retval.add("--demo");
 		return retval.toArray(new String[0]);
 	}
 

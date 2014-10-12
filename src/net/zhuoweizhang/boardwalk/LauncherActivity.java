@@ -18,7 +18,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	public ProgressBar progressBar;
 	public Button playButton;
 	public TextView recommendationText;
-	public boolean refreshedToken = false;
+	public boolean refreshedToken = true; // TODO false;
 
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);

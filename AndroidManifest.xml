@@ -6,8 +6,9 @@
     <uses-sdk android:minSdkVersion="17" android:targetSdkVersion="20" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <application android:label="@string/app_name" android:largeHeap="true">
+    <application android:label="@string/app_name" android:largeHeap="true" android:icon="@drawable/ic_launcher">
         <activity android:name="MainActivity"
             android:label="@string/app_name"
             android:configChanges="orientation|keyboardHidden"
@@ -33,5 +34,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>-->
         </activity>
+
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:theme="@android:style/Theme.Translucent"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
+
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+
     </application>
 </manifest> 
