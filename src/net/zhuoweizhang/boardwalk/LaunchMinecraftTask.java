@@ -44,6 +44,7 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
 				downloadMinecraft(version);
 				dexOptMinecraft(version);
 			}
+			extractDefaultOptions();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -127,6 +128,20 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, Void> {
 		optDir.mkdirs();
 		DexClassLoader classLoader = new DexClassLoader(MinecraftLaunch.getClassPath(version), 
 			optDir.getAbsolutePath(), "", this.getClass().getClassLoader());
+	}
+
+	private void extractDefaultOptions() throws IOException {
+		File boardwalkDir = new File("/sdcard/boardwalk");
+		File gameDir = new File(boardwalkDir, "gamedir");
+		gameDir.mkdirs();
+		File optionsFile = new File(gameDir, "options.txt");
+		if (!optionsFile.exists()) {
+			AssetsUtil.extractFileFromAssets(context, "options.txt", optionsFile);
+		}
+		File nomediaFile = new File(boardwalkDir, ".nomedia");
+		if (!nomediaFile.exists()) {
+			nomediaFile.createNewFile();
+		}
 	}
 
 	protected void onProgressUpdate(String... progress) {

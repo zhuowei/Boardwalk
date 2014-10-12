@@ -281,7 +281,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	}
 
 	public boolean handleGuiBar(int x, int y, MotionEvent e) {
-		//if (!AndroidDisplay.grab) return false;
+		if (!AndroidDisplay.grab) return false;
 		boolean isDown;
 		switch (e.getActionMasked()) {
 			case MotionEvent.ACTION_DOWN:
@@ -302,7 +302,6 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		int barwidth = mcscale(180);
 		int barx = (screenWidth / 2) - (barwidth / 2);
 		int bary = 0;
-		if (BuildConfig.DEBUG) System.out.println("Gui bar: " + barx + ":" + bary + ": my " + x + ":" + y);
 		if (x < barx || x >= barx + barwidth || y < bary || y >= bary + barheight) {
 			return false;
 		}
