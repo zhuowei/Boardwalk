@@ -147,4 +147,19 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		progressBar.setVisibility(View.GONE);
 		updateUiWithLoginStatus();
 	}
+
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add(getResources().getString(R.string.about_app));
+		return true;
+	}
+
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getTitle().equals(getResources().getString(R.string.about_app))) {
+			startActivity(new Intent(this, AboutAppActivity.class));
+			return true;
+		} else {
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
 }

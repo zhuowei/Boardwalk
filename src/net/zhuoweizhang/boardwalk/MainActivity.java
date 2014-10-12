@@ -639,6 +639,8 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			}
 			return true;
 */
+			sendKeyPress(Keyboard.KEY_RETURN, '\n', true);
+			sendKeyPress(Keyboard.KEY_RETURN, (char) 0, false);
 			return true;
 		}
 	}

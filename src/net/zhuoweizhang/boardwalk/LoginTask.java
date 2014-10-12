@@ -59,6 +59,7 @@ public class LoginTask extends AsyncTask<String, Void, String> {
 		if (result == null) {
 			// success
 			activity.progressText.setText("");
+			activity.passwordText.setText(""); // clear the password textbox
 		} else {
 			activity.progressText.setText(activity.getResources().getString(R.string.login_error) + " " + result);
 		}
