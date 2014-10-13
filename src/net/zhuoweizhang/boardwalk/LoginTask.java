@@ -34,6 +34,7 @@ public class LoginTask extends AsyncTask<String, Void, String> {
 	public void onPreExecute() {
 		activity.progressBar.setVisibility(View.VISIBLE);
 		activity.loginButton.setEnabled(false);
+		activity.importCredentialsButton.setEnabled(false);
 		activity.progressText.setText(R.string.login_logging_in);
 		SharedPreferences prefs = activity.getSharedPreferences("launcher_prefs", 0);
 		//prefs.edit().putString("auth_lastEmail", activity.usernameText.getText().toString()).apply();

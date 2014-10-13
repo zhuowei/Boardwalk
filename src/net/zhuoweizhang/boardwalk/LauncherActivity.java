@@ -110,6 +110,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		loginButton.setVisibility(View.GONE);
 		logoutButton.setVisibility(View.GONE);
 		playButton.setVisibility(View.GONE);
+		importCredentialsButton.setVisibility(View.GONE);
 		new LaunchMinecraftTask(this, this).execute();
 	}
 

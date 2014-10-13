@@ -521,8 +521,10 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			MinecraftVersion version = MinecraftDownloader.getVersionInfo(versionName);
 			File optDir = context.getDir("dalvik-cache", 0);
 			optDir.mkdirs();
+			String nativePath = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).
+				applicationInfo.nativeLibraryDir;
 			DexClassLoader classLoader = new DexClassLoader(MinecraftLaunch.getClassPath(version), 
-				optDir.getAbsolutePath(), "", MainActivity.class.getClassLoader());
+				optDir.getAbsolutePath(), nativePath, MainActivity.class.getClassLoader());
 
 			Class<?> clazz = null;
 			try {

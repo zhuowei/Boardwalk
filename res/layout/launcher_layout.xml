@@ -33,10 +33,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/login_button"/>
-    <Button android:id="@+id/launcher_import_credentials_button"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/login_import_credentials"/>
     <Button android:id="@+id/launcher_logout_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -45,6 +41,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/play_demo"/>
+    <Button android:id="@+id/launcher_import_credentials_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/login_import_credentials"/>
     <ProgressBar android:id="@+id/launcher_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
