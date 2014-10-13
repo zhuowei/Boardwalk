@@ -32,7 +32,7 @@ public final class AboutAppActivity extends Activity implements View.OnLongClick
 	public boolean onLongClick(View v) {
 		if (v == appNameText) {
 			Intent intent = new Intent(Intent.ACTION_VIEW);
-			intent.setData(Uri.parse("http://www.youtube.com/watch?v=oHg5SJYRHA0"));
+			intent.setData(Uri.parse("http://www.youtube.com/watch?v=2HQaBWziYvY"));
 			startActivity(intent);
 			return true;
 		}

@@ -8,8 +8,8 @@
     <string name="login_error">Unable to login:</string>
     <string name="login_button">Login</string>
     <string name="login_extra_info_text">This application is not in any way affiliated with Mojang AB.\n
-This version of Boardwalk is very experimental - world generation may take up to 5 minutes, and multiplayer only works on offline servers.\n
-These issues are being investigated and might be fixed in a later version.
+This version of Boardwalk is very experimental - world generation may take up to 5 minutes, multiplayer only works on offline servers, and putting this application in the background causes Minecraft to crash.\n
+These issues are being investigated and may be fixed in a later version.
 </string>
 
     <string name="recommendation_art">Your device supports the Android Runtime (ART), which may be able to run Minecraft faster. You can switch to ART by going to Settings, then Developer Settings, then Select Runtime, and finally select Use ART.\n(Other applications may not be ART compatiable, so you might want to switch back to Dalvik when not using Boardwalk.)</string>
@@ -27,6 +27,7 @@ These issues are being investigated and might be fixed in a later version.
 
     <string name="about_app">About</string>
     <string name="about_librarycredits">This application is made possible by the work of many open-source contributors. Some of the libraries used are glShim, LWJGL, Gson, dx, and jarjar. The full list and applicable licenses can be found at http://git.io/2cWyVg\n
+A special thanks to ptitSeb and lunixbochs for writing glShim, which made this application possible.\n
 This application is not affiliated with Mojang AB. Minecraft ®/TM © 2009-2013 Mojang / Notch.
     </string>
     <string name="about_copyright">Copyright (c) 2014 Zhuowei Zhang</string>

@@ -47,6 +47,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 
 	@Override
 	protected void onPause() {
+		adView.pause();
 		super.onPause();
 		SharedPreferences prefs = this.getSharedPreferences("launcher_prefs", 0);
 		prefs.edit().putString("auth_lastEmail", usernameText.getText().toString()).apply();
@@ -56,6 +57,13 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	protected void onResume() {
 		super.onResume();
 		usernameText.setText(getSharedPreferences("launcher_prefs", 0).getString("auth_lastEmail", ""));
+		adView.resume();
+	}
+
+	@Override
+	protected void onDestroy() {
+		adView.destroy();
+		super.onDestroy();
 	}
 
 	public void updateUiWithLoginStatus() {
