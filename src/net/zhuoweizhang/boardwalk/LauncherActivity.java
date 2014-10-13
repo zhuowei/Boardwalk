@@ -4,9 +4,13 @@ import java.io.File;
 
 import android.app.*;
 import android.content.*;
+import android.net.Uri;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
+
+import com.ipaulpro.afilechooser.FileChooserActivity;
+import com.ipaulpro.afilechooser.utils.FileUtils;
 
 import com.google.android.gms.ads.*;
 
@@ -23,8 +27,11 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	public boolean refreshedToken = true; // TODO false;
 	public boolean isLaunching = false;
 	public Button logoutButton;
+	public Button importCredentialsButton;
 
 	private AdView adView;
+
+	public static final int REQUEST_BROWSE_FOR_CREDENTIALS = 1013; // date when this constant was added
 
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -40,6 +47,8 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		recommendationText = (TextView) findViewById(R.id.launcher_recommendation_text);
 		logoutButton = (Button) findViewById(R.id.launcher_logout_button);
 		logoutButton.setOnClickListener(this);
+		importCredentialsButton = (Button) findViewById(R.id.launcher_import_credentials_button);
+		importCredentialsButton.setOnClickListener(this);
 		updateUiWithLoginStatus();
 		updateRecommendationText();
 		initAds();
@@ -74,6 +83,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			: R.string.play_demo));
 		loginButton.setVisibility(loggedIn? View.GONE: View.VISIBLE);
 		logoutButton.setVisibility(loggedIn? View.VISIBLE: View.GONE);
+		importCredentialsButton.setVisibility(loggedIn? View.GONE: View.VISIBLE);
 	}
 
 	public void onClick(View v) {
@@ -83,6 +93,8 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			doLaunch();
 		} else if (v == logoutButton) {
 			doLogout();
+		} else if (v == importCredentialsButton) {
+			doBrowseForCredentials();
 		}
 	}
 
@@ -170,4 +182,34 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		}
 	}
 
+	public void doBrowseForCredentials() {
+		new AlertDialog.Builder(this).setMessage(R.string.login_import_credentials_info).
+			setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialogI, int button) {
+						Intent target = FileUtils.createGetContentIntent();
+						target.setType("application/json");
+						target.setClass(LauncherActivity.this, FileChooserActivity.class);
+
+						startActivityForResult(target, REQUEST_BROWSE_FOR_CREDENTIALS);
+					}
+			}).
+			setNegativeButton(android.R.string.cancel, null).
+			show();
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case REQUEST_BROWSE_FOR_CREDENTIALS:
+				if (resultCode == RESULT_OK) {  
+					final Uri uri = data.getData();
+					File file = FileUtils.getFile(uri);
+					new ImportVanillaAuthTask(this).execute(file.getAbsolutePath());
+				}
+				break;
+			default:
+				super.onActivityResult(requestCode, resultCode, data);
+				break;
+		}
+	}
 }

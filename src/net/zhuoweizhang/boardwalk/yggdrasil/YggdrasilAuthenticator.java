@@ -73,8 +73,8 @@ public class YggdrasilAuthenticator {
 		return makeRequest("authenticate", request, AuthenticateResponse.class);
 	}
 
-	/*public RefreshResponse refresh(String authToken, UUID clientId, Profile activeProfile) throws IOException {
-		RefreshRequest request = new RefreshRequest(authToken, clientId, activeProfile);
+	public RefreshResponse refresh(String authToken, UUID clientId/*, Profile activeProfile*/) throws IOException {
+		RefreshRequest request = new RefreshRequest(authToken, clientId/*, activeProfile*/);
 		return makeRequest("refresh", request, RefreshResponse.class);
-	}*/
+	}
 }

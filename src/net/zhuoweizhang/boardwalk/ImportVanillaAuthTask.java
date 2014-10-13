@@ -1,34 +1,25 @@
 package net.zhuoweizhang.boardwalk;
 
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import android.content.*;
 import android.os.*;
 import android.util.*;
 import android.view.*;
-import net.zhuoweizhang.boardwalk.yggdrasil.*;
 
-public class LoginTask extends AsyncTask<String, Void, String> {
+import com.google.gson.*;
+
+import net.zhuoweizhang.boardwalk.yggdrasil.*;
+import net.zhuoweizhang.boardwalk.model.vanillalauncher.*;
+
+public class ImportVanillaAuthTask extends AsyncTask<String, Void, String> {
 	private LauncherActivity activity;
 	private YggdrasilAuthenticator authenticator = new YggdrasilAuthenticator();
-	public LoginTask(LauncherActivity activity) {
+	private Gson gson = new Gson();
+	public ImportVanillaAuthTask(LauncherActivity activity) {
 		this.activity = activity;
-	}
-
-	private UUID getClientId() {
-		SharedPreferences prefs = activity.getSharedPreferences("launcher_prefs", 0);
-		String out = prefs.getString("auth_clientId", null);
-		boolean needsRegenUUID = prefs.getBoolean("auth_importedCredentials", false);
-		UUID retval;
-		if (out == null || needsRegenUUID) {
-			retval = UUID.randomUUID();
-			prefs.edit().putString("auth_clientId", retval.toString()).
-				putBoolean("auth_importedCredentials", false).
-				apply();
-		} else {
-			retval = UUID.fromString(out);
-		}
-		return retval;
 	}
 
 	public void onPreExecute() {
@@ -41,20 +32,39 @@ public class LoginTask extends AsyncTask<String, Void, String> {
 
 	public String doInBackground(String... args) {
 		try {
-			AuthenticateResponse response = authenticator.authenticate(args[0], args[1], getClientId());
+			LauncherProfiles theProfiles = getAuth(new File(args[0]));
+
+			LauncherAuth auth = theProfiles.authenticationDatabase.get(theProfiles.selectedUser);
+
+			RefreshResponse response = authenticator.refresh(auth.accessToken, theProfiles.clientToken);
 			if (response == null) return "Response is null?";
 			if (response.selectedProfile == null) return activity.getResources().getString(R.string.login_is_demo_account);
 			SharedPreferences prefs = activity.getSharedPreferences("launcher_prefs", 0);
 			prefs.edit().
+				putString("auth_clientToken", response.clientToken.toString()).
 				putString("auth_accessToken", response.accessToken).
 				putString("auth_profile_name", response.selectedProfile.name).
 				putString("auth_profile_id", response.selectedProfile.id).
+				putBoolean("auth_importedCredentials", true).
 				apply();
 			return null;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return e.toString();
 		}
+	}
+
+	private LauncherProfiles getAuth(File file) throws IOException {
+		FileInputStream fis = null;
+		byte[] fileContents = new byte[(int) file.length()];
+		try {
+			fis = new FileInputStream(file);
+			fis.read(fileContents);
+		} finally {
+			if (fis != null) fis.close();
+		}
+		String theString = new String(fileContents, Charset.forName("UTF-8"));
+		return gson.fromJson(theString, LauncherProfiles.class);
 	}
 
 	public void onPostExecute(String result) {
