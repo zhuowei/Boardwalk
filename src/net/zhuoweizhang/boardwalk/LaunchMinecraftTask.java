@@ -14,7 +14,7 @@ import net.zhuoweizhang.boardwalk.util.*;
 
 public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 
-	public static final int MY_VERSION = 1;
+	public static final int MY_VERSION = 2;
 
 	private Context context;
 	private boolean forceDex;
@@ -108,7 +108,7 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 			}
 			publishProgress(context.getResources().getString(R.string.convert_converting) + " " + library.name);
 			File outputPath = LibrariesRepository.getDexTargetPath(parts[0], parts[1], parts[2]);
-			MinecraftLaunch.runConvert(localPath, outputPath, MinecraftLaunch.libsToRename.contains(parts[1]), null);
+			MinecraftLaunch.runConvert(localPath, outputPath, /*MinecraftLaunch.libsToRename.contains(parts[1])*/true, null);
 		}
 	}
 

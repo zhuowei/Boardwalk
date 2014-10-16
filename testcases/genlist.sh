@@ -1,4 +1,5 @@
 #!/bin/sh
+echo "rule org.apache.** net.zhuoweizhang.boardwalk.@0"
 cd ../../makeshift/src
 for f in `find . -type f`
 do

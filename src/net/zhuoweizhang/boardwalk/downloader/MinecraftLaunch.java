@@ -145,7 +145,7 @@ public class MinecraftLaunch {
 				continue;
 			}
 			File outputPath = LibrariesRepository.getDexTargetPath(parts[0], parts[1], parts[2]);
-			runConvert(localPath, outputPath, libsToRename.contains(parts[1]), null);
+			runConvert(localPath, outputPath, /*libsToRename.contains(parts[1])*/true, null);
 		}
 		
 	}

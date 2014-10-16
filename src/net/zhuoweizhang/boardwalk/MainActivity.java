@@ -563,12 +563,15 @@ public class MainActivity extends Activity implements View.OnTouchListener
 
 	public static void initEnvs() {
 		try {
+			/*
 			Class<?> libcoreClass = Class.forName("libcore.io.Libcore");
 			Field osField = libcoreClass.getField("os");
 			Object os = osField.get(null);
 			Class osClass = os.getClass();
 			Method setEnvMethod = osClass.getMethod("setenv", String.class, String.class, Boolean.TYPE);
 			setEnvMethod.invoke(os, "LIBGL_MIPMAP", "3", true);
+			*/
+			DalvikTweaks.setenv("LIBGL_MIPMAP", "3", true);
 			System.setProperty("user.home", "/sdcard/boardwalk");
 			if (!System.getProperty("user.home", "/").equals("/sdcard/boardwalk")) {
 				forceUserHome("/sdcard/boardwalk");

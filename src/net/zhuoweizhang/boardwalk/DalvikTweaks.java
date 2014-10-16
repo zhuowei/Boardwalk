@@ -13,6 +13,8 @@ public class DalvikTweaks {
 		return Integer.parseInt(versionParts[0]) == 1;
 	}
 
+	public static native void setenv(String name, String value, boolean override);
+
 	static {
 		System.loadLibrary("boardwalk");
 	}
