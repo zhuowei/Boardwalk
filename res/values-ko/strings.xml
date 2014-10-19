@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Boardwalk</string>
+    <string name="select_file">SD에서 파일 선택</string>
+    <string name="login_username_hint">사용자이름 또는 모장 계정 이메일</string>
+    <string name="login_password_hint">비밀번호</string>
+    <string name="login_is_demo_account">"이 계정은 마인크래프트를 구매하지 않은 것 같습니다. 마인크래프트를 구매하셨습니까? 밑에 데모 플레이 버튼으로 데모버전을 이용할 수 있습니다."</string>
+    <string name="login_logging_in">로그인 중…</string>
+    <string name="login_error">로그인 불가:</string>
+    <string name="login_button">로그인</string>
+    <string name="login_extra_info_text">"이 버전의 보드워커는 실험적입니다 - 맵 생성은 5분까지 걸릴 수 있으며 멀티플레이는 오프라인 서버에서만 가능합니다. 그리고 백그라운드에 어플리케이션을 실행시키면 마인크래프트가 강제종료 될 것입니다.
+ 이 문제들은 조사되었으며 나중에 고쳐질 수 있습니다."</string>
+    <string name="login_import_credentials">launcher_profiles.json에서 자격인증 사용</string>
+    <string name="login_import_credentials_info">"여기에 사용자이름과 비밀번호를 입력하지 않고 PC 마인크래프트 런처에 로그인 자격인증서를 사용하여 로그인 할 수 있습니다.
+ 이것을 하려면 MCPC에 로그인하고, .minecraft/launcher_profiles.json을 핸드폰으로 복사해오세요. 그리고 OK를 누르면 launcher_profiles.json 이 적용됩니다. 적용 과정에서 컴퓨터 런처가 로그아웃이 되니 주의해주세요."</string>
+    <string name="recommendation_art">"이 기기는 마인크래프트를 더 빠르게 실행할 수 있는 안드로이드 런타임(ART)를 지원합니다. 설정 - 개발자 설정 - 런타임에서 ART를 선택하여 사용할 수 있습니다. (다른 어플리케이션에서는 ART가 지원되지 않을 수 있습니다. 보드워커를 사용하지 않을 때에는 달빅으로 다시 바꾸는 것이 좋습니다.)"</string>
+    <string name="recommendation_memory">안타깝게도, 이 기기는 지원하지 않습니다. 어플리케이션이 마인크래프트를 안드로이드에 구동하기 위해서는 최소 1G의 메모리가 필요합니다. 만약 실행을 하면 어플리케이션이 강제종료 될 것입니다.</string>
+    <string name="recommendation_dual_core">안타깝게도, 이 기기는 지원하지 않습니다. 이 어플리케이션은 듀얼코어 이상의 CPU가 필요합니다. 그렇지 않으면 어플리케이션이 느리게 구동 될 것입니다.</string>
+    <string name="play_offline">오프라인 플레이</string>
+    <string name="play_demo">데모 플레이</string>
+    <string name="play_regular">마인크래프트 실행</string>
+    <string name="convert_populating_working_directory">작업 폴더 이동 중... 설치 중에는 어플에서 나가지 마세요. 약 4분정도 걸립니다.</string>
+    <string name="convert_downloading">다운로드 중</string>
+    <string name="convert_converting">변환 중</string>
+    <string name="convert_preparing_to_launch_minecraft">마인크래프트를 실행하기 위해 준비하는 중</string>
+    <string name="about_app">정보</string>
+    <string name="about_librarycredits">"이 어플리케이션은 많은 오픈소스 제공자들 덕분에 만들 수 있었습니다. 사용한 몇 개의 라이브러리에는 glShim, LWJGL, Gson, dx, jarjar 가 있습니다. 사용한 모든 리스트와 해당되는 라이센스는 http://git.io/2cWyVg 에 있습니다. 
+ 특별히 glShim 개발을 도와주어 어플을 가능하게 만들어준 ptitSeb 와 lunixbochs 에게 감사드립니다.
+ 이 어플리케이션은 Mojang AB와 연계가 없습니다.
+ Minecraft ®/TM © 2009-2013 Mojang / Notch "</string>
+    <string name="about_copyright">Copyright (c) 2014 Zhuowei Zhang</string>
+</resources>
