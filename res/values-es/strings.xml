@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Boardwalk</string>
+    <string name="login_username_hint">Nombre de usuario o e-mail de Mojang</string>
+    <string name="login_password_hint">Password</string>
+    <string name="login_is_demo_account">Esta cuenta no parece tener un usuario de Minecraft afiliado a ella. ¿Compraste Minecraft? Puedes jugar la versión Demo con el botón de abajo llamado "Jugar Demo".</string>
+    <string name="login_logging_in">Iniciando sesión en&#8230;</string>
+    <string name="login_error">Imposible iniciar sesión:</string>
+    <string name="login_button">Iniciar sesión</string>
+    <string name="login_extra_info_text">Esta versión de Boardwalk es muy experimental - la generación de un mundo puede tardar más de 5 minutos, el modo multijugador solamente funciona en servidores offline, y ejecutar esta aplicación en el fondo causa que Minecraft se colapse.\n
+Estos errores estan siendo investigados y serán arreglados en una versión próxima.
+</string>
+    <string name="login_import_credentials">Importar credenciales desde launcher_profiles.json</string>
+    <string name="login_import_credentials_info">Puedes importar tus credenciales de sesión desde el launcher oficial del Minecraft PC en lugar de insertar tu nombre de usuario y password aquí.\nPara hacer esto, inicia sesión en Minecraft en tu computadora, y luego copia el archivo en  .minecraft/launcher_profiles.json de tu computadora a tu dispositivo. Finalmente, haz click en OK y selecciona e importa el archivo launcher_profiles.json.\n
+Nota que el proceso de importación te cerrará tu sesión del launcher del Minecraft PC.</string>
+ 
+    <string name="recommendation_art">Tu dispositivo soporta el Android Runtime (ART), que puede ser capaz de ejecutar Minecraft más rápido. Puedes cambiar a ART al ir a Configuración, despues Opciones del Programador, selecciona Tiempo de ejecución, y finalmente selecciona Usar ART.\n(Otras aplicaciones pueden ser no compatibles con ART, así que quedrás cambiar de nuevo a Dalvik al dejar de usar Boardwalk.)</string>
+    <string name="recommendation_memory">Desgraciadamente, tu dispositivo no es soportado por esta aplicación, ya que requiere 1 GB de memoria para convertir Minecraft PC a Android. La aplicación puede forzar el cierre de ella si tratas de ejecutarlo.</string>
+    <string name="recommendation_dual_core">Desgraciadamente, tu dispositivo no es soportado por esta aplicación, ya que requiere un procesador dual-core CPU o uno mejor. De otro modo, la aplicación se ejecutará muy lento.</string>
+ 
+    <string name="play_offline">Jugar Offline</string>
+    <string name="play_demo">Jugar Demo</string>
+    <string name="play_regular">Iniciar Minecraft</string>
+    <string name="convert_populating_working_directory">Llenando directorio de trabajo</string>
+    <string name="convert_downloading">Descargando</string>
+    <string name="convert_converting">Convirtiendo</string>
+    <string name="convert_preparing_to_launch_minecraft">Preparando para iniciar Minecraft</string>
+ 
+ 
+    <string name="about_app">Acerca de</string>
+    <string name="about_librarycredits">Esta aplicación fue hecha posible por el trabajo de muchos contribuidores de código abierto. Varias de las librerias usadas son glShim, LWJGL, Gson, dx, y jarjar. La lista completa y licencias aplicadas pueden ser encontradas en http://git.io/2cWyVg\n
+Muchísimas gracias a ptitSeb y lunixbochs por escribir glShim, que hizo esta aplicación posible.\n
+Esta aplicación no esta afiliada con Mojang AB. Minecraft Â®/TM Â© 2009-2013 Mojang / Notch. Traducción al español por jose-vm (José Vázquez).
+    </string>
+    <string name="about_copyright">Derechos Copyright (c) 2014 Zhuowei Zhang</string>
+</resources>
