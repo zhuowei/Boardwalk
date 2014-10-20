@@ -60,12 +60,27 @@ public class MinecraftLaunch {
 		File dexPack = getDexPackFile(version);
 		File dexPackTemp = File.createTempFile(dexPack.getName(), ".jar", tmpDir);
 		dexPack.getParentFile().mkdirs();
-		runConvert(minecraftJar, dexPackTemp, true, "jarjarrules_minecraft.txt");
+		runRename(new File(launcherDir, "jarjarrules_minecraft.txt"), minecraftJar, dexPackTemp);
+		List<File> shards = CleanZipUtil.shardZip(dexPackTemp, tmpDir, getShardCount());
+
+		List<File> dexedShards = new ArrayList<File>(shards.size());
+
+		for (File f: shards) {
+			File dexedShard = File.createTempFile(dexPack.getName(), ".jar", tmpDir);
+			dexedShards.add(dexedShard);
+			runDex(Arrays.asList(f), dexedShard);
+			f.delete();
+		}
+
+		runDex(dexedShards, dexPack);
+		for (File f: dexedShards) {
+			f.delete();
+		}
 
 		/*List<File> dexedLibs = getDexedLibsForVersion(version);
 		dexedLibs.add(mcDexedJarTemp);
 		runDex(dexedLibs, mcJarTemp);*/
-		CleanZipUtil.process(dexPackTemp, dexPack);
+		//CleanZipUtil.process(dexPackTemp, dexPack);
 		//extractExtraDex(dexPack);
 
 		//mcJarTemp.delete();
@@ -213,6 +228,7 @@ public class MinecraftLaunch {
 		argsNew.addAll(javaVMCmd);
 		argsNew.add("-Xms128M");
 		argsNew.add("-Xmx768M");
+		//argsNew.add("-Xss512K");
 		if (javaVMCmd.get(0).equals("dalvikvm")) argsNew.add("-XX:HeapMaxFree=128M");
 		argsNew.add(className);
 		argsNew.addAll(args);
@@ -223,5 +239,12 @@ public class MinecraftLaunch {
 			System.out.println(line);
 		}
 		p.waitFor();
+	}
+
+	public static int getShardCount() {
+		int memoryAmountInMB = (int) (PlatformUtils.getTotalMemory() / 1024 / 1024);
+		final int classesPerMB = 2;
+		final int divisor = 2;
+		return (memoryAmountInMB / divisor) * classesPerMB;
 	}
 }

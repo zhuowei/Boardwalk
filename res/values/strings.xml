@@ -14,7 +14,7 @@ These issues are being investigated and may be fixed in a later version.
     <string name="login_import_credentials_info">You can import your login credentials from the official PC Minecraft launcher instead of entering your username and password here.\nTo do this, login to Minecraft on your computer, then copy .minecraft/launcher_profiles.json from your computer to your device. Finally, click OK to select and import the launcher_profiles.json.\n
 Note that the import process will log you out on the desktop launcher.</string>
 
-    <string name="recommendation_art">Your device supports the Android Runtime (ART), which may be able to run Minecraft faster. You can switch to ART by going to Settings, then Developer Settings, then Select Runtime, and finally select Use ART.\n(Other applications may not be ART compatiable, so you might want to switch back to Dalvik when not using Boardwalk.)</string>
+    <string name="recommendation_art">Your device supports the Android Runtime (ART), which may be able to run Minecraft faster. You can switch to ART by going to Settings, then Developer Settings, then Select Runtime, and finally select Use ART.\n(Other applications may not be ART compatible, so you might want to switch back to Dalvik when not using Boardwalk.)</string>
     <string name="recommendation_memory">Unfortunately, your device is not supported, as this application requires 1GB of memory to convert Minecraft for Android. The application may force close if you try to launch.</string>
     <string name="recommendation_dual_core">Unfortunately, your device is not supported, as this application requires a dual-core CPU or better. Otherwise, the application will run very slowly.</string>
 

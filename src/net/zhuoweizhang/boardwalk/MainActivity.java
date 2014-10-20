@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -28,8 +29,9 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.AndroidContextImplementation;
 import org.lwjgl.opengl.AndroidDisplay;
 import org.lwjgl.opengl.AndroidKeyCodes;
-import android.opengl.*;
 import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLContext;
 
 import net.zhuoweizhang.boardwalk.downloader.*;
 import net.zhuoweizhang.boardwalk.model.*;
@@ -130,12 +132,14 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				AndroidDisplay.windowHeight = glSurfaceView.getHeight() / scaleFactor;
 				calculateMcScale();
 				System.out.println("WidthHeight: " + AndroidDisplay.windowWidth + ":" + AndroidDisplay.windowHeight);
-				AndroidContextImplementation.context = EGL14.eglGetCurrentContext();
-				AndroidContextImplementation.display = EGL14.eglGetCurrentDisplay();
-				AndroidContextImplementation.read = EGL14.eglGetCurrentSurface(EGL14.EGL_READ);
-				AndroidContextImplementation.draw = EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW);
-				EGL14.eglMakeCurrent(AndroidContextImplementation.display, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE,
-					EGL14.EGL_NO_CONTEXT);
+				EGL10 theEgl = (EGL10) EGLContext.getEGL();
+				AndroidContextImplementation.theEgl = theEgl;
+				AndroidContextImplementation.context = theEgl.eglGetCurrentContext();
+				AndroidContextImplementation.display = theEgl.eglGetCurrentDisplay();
+				AndroidContextImplementation.read = theEgl.eglGetCurrentSurface(EGL10.EGL_READ);
+				AndroidContextImplementation.draw = theEgl.eglGetCurrentSurface(EGL10.EGL_DRAW);
+				theEgl.eglMakeCurrent(AndroidContextImplementation.display, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE,
+					EGL10.EGL_NO_CONTEXT);
 				System.out.println("Gave up context: " + AndroidContextImplementation.context);
 				//File dexOut = new File("/sdcard/boardwalk/testcases_final.jar");
 				//runCraft(dexOut);
