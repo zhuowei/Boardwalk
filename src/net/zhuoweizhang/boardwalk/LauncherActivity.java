@@ -171,12 +171,19 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(getResources().getString(R.string.about_app));
+		if (Build.VERSION.SDK_INT >= 16) { // Jelly Bean
+			menu.add(getResources().getString(R.string.export_log));
+		}
 		return true;
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getTitle().equals(getResources().getString(R.string.about_app))) {
+		CharSequence itemName = item.getTitle();
+		if (itemName.equals(getResources().getString(R.string.about_app))) {
 			startActivity(new Intent(this, AboutAppActivity.class));
+			return true;
+		} else if (itemName.equals(getResources().getString(R.string.export_log))) {
+			doExportLog();
 			return true;
 		} else {
 			return super.onOptionsItemSelected(item);
@@ -211,6 +218,16 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			default:
 				super.onActivityResult(requestCode, resultCode, data);
 				break;
+		}
+	}
+
+	private void doExportLog() {
+		try {
+			Runtime.getRuntime().exec(new String[] {"logcat", "-d", "-f", "/sdcard/boardwalk/log.txt"});
+			progressText.setText("Log exported to /sdcard/boardwalk/log.txt");			
+		} catch (Exception e) {
+			e.printStackTrace();
+			// Sigh.
 		}
 	}
 }

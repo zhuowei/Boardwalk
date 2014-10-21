@@ -26,6 +26,8 @@ Note that the import process will log you out on the desktop launcher.</string>
     <string name="convert_converting">Converting</string>
     <string name="convert_preparing_to_launch_minecraft">Preparing to launch Minecraft</string>
 
+    <string name="export_log">Export log</string>
+
 
     <string name="about_app">About</string>
     <string name="about_librarycredits">This application is made possible by the work of many open-source contributors. Some of the libraries used are glShim, LWJGL, Gson, dx, and jarjar. The full list and applicable licenses can be found at http://git.io/2cWyVg\n
