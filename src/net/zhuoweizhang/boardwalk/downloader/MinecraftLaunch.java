@@ -229,16 +229,24 @@ public class MinecraftLaunch {
 		argsNew.add("-Xms128M");
 		argsNew.add("-Xmx768M");
 		//argsNew.add("-Xss512K");
-		if (javaVMCmd.get(0).equals("dalvikvm")) argsNew.add("-XX:HeapMaxFree=128M");
+		if (javaVMCmd.get(0).equals("dalvikvm") && PlatformUtils.getAndroidVersion() >= 17 /* 4.2 */) {
+			argsNew.add("-XX:HeapMaxFree=128M");
+		}
 		argsNew.add(className);
 		argsNew.addAll(args);
 		Process p = new ProcessBuilder(argsNew).redirectErrorStream(true).start();
 		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		String line;
+		StringBuffer buf = new StringBuffer();
 		while((line = in.readLine()) != null) {
 			System.out.println(line);
+			buf.append(line);
+			buf.append('\n');
 		}
-		p.waitFor();
+		int retval = p.waitFor();
+		if (retval != 0) {
+			throw new RuntimeException("Dex returned " + retval + " with error: \n" + buf);
+		}
 	}
 
 	public static int getShardCount() {

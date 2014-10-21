@@ -4,6 +4,9 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+/* Must not have Android dependencies. Reflection is OK.
+ * Stuff that links directly to Android stuff goes in DroidUtils
+ */
 public class PlatformUtils {
 	/** @return amount of physical memory in bytes */
 	public static long getTotalMemory() {
@@ -43,6 +46,15 @@ public class PlatformUtils {
 			return dir.listFiles(filter).length;
 		} catch (Exception e) {
 			return Math.max(1, Runtime.getRuntime().availableProcessors());
+		}
+	}
+
+	public static int getAndroidVersion() {
+		try {
+			return Class.forName("android.os.Build$VERSION").getField("SDK_INT").getInt(null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
 		}
 	}
 }
