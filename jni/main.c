@@ -16,11 +16,17 @@ static void* getLibDvm() {
 	return libDvmHandle;
 }
 
-JNIEXPORT void JNICALL Java_net_zhuoweizhang_boardwalk_DalvikTweaks_setDefaultStackSize
-  (JNIEnv *env, jclass clazz, jint size) {
-	struct DvmGlobals* gDvm = dlsym(getLibDvm(), "gDvm");
+JNIEXPORT void JNICALL Java_net_zhuoweizhang_boardwalk_DalvikTweaks_nativeSetDefaultStackSize
+  (JNIEnv *env, jclass clazz, jint size, jint androidBuild) {
+	void* gDvm = dlsym(getLibDvm(), "gDvm");
 	if (gDvm == NULL) return;
-	gDvm->stackSize = size;
+	if (androidBuild <= 16) { // 4.1 and below
+		((struct DvmGlobals_ics*) gDvm)->stackSize = size;
+	} else if (androidBuild <= 18) { // 4.2, 4.3
+		((struct DvmGlobals_jbmr1*) gDvm)->stackSize = size;
+	} else { // 4.4 and above
+		((struct DvmGlobals*) gDvm)->stackSize = size;
+	}
 }
 
 JNIEXPORT void JNICALL Java_net_zhuoweizhang_boardwalk_DalvikTweaks_crashTheLogger

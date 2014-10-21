@@ -2,7 +2,10 @@ package net.zhuoweizhang.boardwalk;
 
 public class DalvikTweaks {
 
-	public static native void setDefaultStackSize(int size);
+	public static void setDefaultStackSize(int size) {
+		nativeSetDefaultStackSize(size, android.os.Build.VERSION.SDK_INT);
+	}
+	public static native void nativeSetDefaultStackSize(int size, int androidBuild);
 	public static native void crashTheLogger();
 
 	public static boolean isDalvik() {
