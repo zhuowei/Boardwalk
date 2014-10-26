@@ -228,7 +228,7 @@ public class MinecraftLaunch {
 		argsNew.addAll(javaVMCmd);
 		argsNew.add("-Xms128M");
 		argsNew.add("-Xmx768M");
-		//argsNew.add("-Xss512K");
+		argsNew.add("-Xss256K");
 		if (javaVMCmd.get(0).equals("dalvikvm") && PlatformUtils.getAndroidVersion() >= 17 /* 4.2 */) {
 			argsNew.add("-XX:HeapMaxFree=128M");
 		}

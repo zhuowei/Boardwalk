@@ -28,6 +28,21 @@ Note that the import process will log you out on the desktop launcher.</string>
 
     <string name="export_log">Export log</string>
 
+    <string name="control_keyboard">Keyboard</string>
+    <string name="control_chat">Chat</string>
+    <string name="control_debug">Debug</string>
+    <string name="controls">Controls</string>
+    <string name="control_primary">Pri</string>
+    <string name="control_secondary">Sec</string>
+    <string name="control_shift">Sft</string>
+    <string name="control_inventory">Inv</string>
+    <string name="control_up">▲</string>
+    <string name="control_jump">■</string>
+    <string name="control_left">◀</string>
+    <string name="control_right">▶</string>
+    <string name="control_down">▼</string>
+
+
 
     <string name="about_app">About</string>
     <string name="about_librarycredits">This application is made possible by the work of many open-source contributors. Some of the libraries used are glShim, LWJGL, Gson, dx, and jarjar. The full list and applicable licenses can be found at http://git.io/2cWyVg\n

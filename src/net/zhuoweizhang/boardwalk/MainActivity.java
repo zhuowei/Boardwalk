@@ -50,10 +50,11 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	private GLSurfaceView glSurfaceView;
 	private DisplayMetrics displayMetrics;
 	private static String[] libsToRename = {"vecmath", "testcases"};
-	private Button forwardButton, jumpButton, primaryButton, secondaryButton;
+	private Button jumpButton, primaryButton, secondaryButton;
 	private Button debugButton, shiftButton;
 	private Button keyboardButton;
 	private Button inventoryButton, talkButton;
+	private Button upButton, downButton, leftButton, rightButton;
 	private int scaleFactor = 1;
 	private PopupWindow hiddenTextWindow;
 	private TextView hiddenTextView;
@@ -61,6 +62,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	private boolean hiddenTextIgnoreUpdate = true;
 	private int guiScale = 1;
 	public static final int KEY_BACKSPACE = 14; //WTF lwjgl?
+	private ViewGroup overlayView;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -86,7 +88,10 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		//glSurfaceView = new GLSurfaceView(this);
 		setContentView(R.layout.main);
 
-		forwardButton = findButton(R.id.control_forward);
+		upButton = findButton(R.id.control_up);
+		downButton = findButton(R.id.control_down);
+		leftButton = findButton(R.id.control_left);
+		rightButton = findButton(R.id.control_right);
 		jumpButton = findButton(R.id.control_jump);
 		primaryButton = findButton(R.id.control_primary);
 		secondaryButton = findButton(R.id.control_secondary);
@@ -95,12 +100,14 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		keyboardButton = findButton(R.id.control_keyboard);
 		inventoryButton = findButton(R.id.control_inventory);
 		talkButton = findButton(R.id.control_talk);
+		overlayView = (ViewGroup) findViewById(R.id.main_control_overlay);
 
 		registerShutdownHook();
 
 		glSurfaceView = (GLSurfaceView) findViewById(R.id.main_gl_surface);
 		glSurfaceView.setOnTouchListener(new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent e) {
+				System.out.println(e);
 				int x = ((int) e.getX()) / scaleFactor;
 				int y = (glSurfaceView.getHeight() - (int) e.getY()) / scaleFactor;
 				if (handleGuiBar(x, y, e)) return true;
@@ -200,8 +207,14 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				return false;
 		}
 		if (BuildConfig.DEBUG) System.out.println("Button: " + isDown + ":" + v);
-		if (v == forwardButton) {
+		if (v == upButton) {
 			sendKeyPress(Keyboard.KEY_W, isDown);
+		} else if (v == downButton) {
+			sendKeyPress(Keyboard.KEY_S, isDown);
+		} else if (v == leftButton) {
+			sendKeyPress(Keyboard.KEY_A, isDown);
+		} else if (v == rightButton) {
+			sendKeyPress(Keyboard.KEY_D, isDown);
 		} else if (v == jumpButton) {
 			sendKeyPress(Keyboard.KEY_SPACE, isDown);
 		} else if (v == primaryButton) {
