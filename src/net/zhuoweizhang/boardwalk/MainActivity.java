@@ -107,7 +107,6 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		glSurfaceView = (GLSurfaceView) findViewById(R.id.main_gl_surface);
 		glSurfaceView.setOnTouchListener(new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent e) {
-				System.out.println(e);
 				int x = ((int) e.getX()) / scaleFactor;
 				int y = (glSurfaceView.getHeight() - (int) e.getY()) / scaleFactor;
 				if (handleGuiBar(x, y, e)) return true;

@@ -6,6 +6,10 @@ public class DalvikTweaks {
 		nativeSetDefaultStackSize(size, android.os.Build.VERSION.SDK_INT);
 	}
 	public static native void nativeSetDefaultStackSize(int size, int androidBuild);
+	public static void setHeapMaxFree(long size) {
+		nativeSetHeapMaxFree(size, android.os.Build.VERSION.SDK_INT);
+	}
+	public static native void nativeSetHeapMaxFree(long size, int androidBuild);
 	public static native void crashTheLogger();
 
 	public static boolean isDalvik() {

@@ -45,3 +45,16 @@ JNIEXPORT void JNICALL Java_net_zhuoweizhang_boardwalk_DalvikTweaks_setenv
 	(*env)->ReleaseStringUTFChars(env, nameStr, name);
 	(*env)->ReleaseStringUTFChars(env, valueStr, value);
 }
+
+JNIEXPORT void JNICALL Java_net_zhuoweizhang_boardwalk_DalvikTweaks_nativeSetHeapMaxFree
+  (JNIEnv *env, jclass clazz, jlong size, jint androidBuild) {
+	void* gDvm = dlsym(getLibDvm(), "gDvm");
+	if (gDvm == NULL) return;
+	if (androidBuild <= 16) { // 4.1 and below
+		// Do nothing
+	} else if (androidBuild <= 18) { // 4.2, 4.3
+		((struct DvmGlobals_jbmr1*) gDvm)->heapMaxFree = size;
+	} else { // 4.4 and above
+		((struct DvmGlobals*) gDvm)->heapMaxFree = size;
+	}
+}
