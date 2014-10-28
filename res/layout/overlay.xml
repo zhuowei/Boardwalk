@@ -46,6 +46,17 @@
         android:layout_toRightOf="@+id/control_talk"
         android:background="@drawable/control_button"
         android:text="@string/control_keyboard" />
+    <Button
+        android:id="@+id/control_thirdperson"
+        android:layout_width="wrap_content"
+        android:layout_height="30dip"
+        android:layout_marginRight="2dip"
+        android:layout_marginTop="2dip"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/control_debug"
+        android:background="@drawable/control_button"
+        android:text="@string/control_thirdperson" />
+
     
     <Button
         android:id="@+id/control_down"

@@ -41,6 +41,7 @@ Note that the import process will log you out on the desktop launcher.</string>
     <string name="control_left">◀</string>
     <string name="control_right">▶</string>
     <string name="control_down">▼</string>
+    <string name="control_thirdperson">3rd</string>
 
 
 

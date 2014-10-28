@@ -57,6 +57,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	private Button keyboardButton;
 	private Button inventoryButton, talkButton;
 	private Button upButton, downButton, leftButton, rightButton;
+	private Button thirdPersonButton;
 	private int scaleFactor = 1;
 	private PopupWindow hiddenTextWindow;
 	private TextView hiddenTextView;
@@ -124,6 +125,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		keyboardButton = findButton(R.id.control_keyboard);
 		inventoryButton = findButton(R.id.control_inventory);
 		talkButton = findButton(R.id.control_talk);
+		thirdPersonButton = findButton(R.id.control_thirdperson);
 		overlayView = (ViewGroup) findViewById(R.id.main_control_overlay);
 
 		registerShutdownHook();
@@ -272,6 +274,8 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			sendKeyPress(Keyboard.KEY_T, isDown);
 		} else if (v == keyboardButton) {
 			showHiddenTextbox();
+		} else if (v == thirdPersonButton) {
+			sendKeyPress(Keyboard.KEY_F5, isDown);
 		} else {
 			return false;
 		}
