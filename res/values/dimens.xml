@@ -1,0 +1,3 @@
+<resources>
+    <dimen name="finger_still_threshold">6dip</dimen>
+</resources>

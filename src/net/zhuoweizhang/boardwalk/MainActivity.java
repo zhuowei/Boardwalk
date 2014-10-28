@@ -13,6 +13,8 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Selection;
@@ -63,6 +65,28 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	private int guiScale = 1;
 	public static final int KEY_BACKSPACE = 14; //WTF lwjgl?
 	private ViewGroup overlayView;
+	private boolean triggeredLeftMouseButton = false;
+	private int initialX, initialY;
+	private static final int MSG_LEFT_MOUSE_BUTTON_CHECK = 1028;
+	private int fingerStillThreshold = 8;
+
+	private Handler theHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+				case MSG_LEFT_MOUSE_BUTTON_CHECK: {
+					int x = AndroidDisplay.mouseX;
+					int y = AndroidDisplay.mouseY;
+					if (AndroidDisplay.grab &&
+						Math.abs(initialX - x) < fingerStillThreshold &&
+						Math.abs(initialY - y) < fingerStillThreshold) {
+						triggeredLeftMouseButton = true;
+						sendMouseButton(0, true);
+					}
+					break;
+				}
+			}
+		}
+	};
 
 	/** Called when the activity is first created. */
 	@Override
@@ -104,6 +128,8 @@ public class MainActivity extends Activity implements View.OnTouchListener
 
 		registerShutdownHook();
 
+		fingerStillThreshold = getResources().getDimensionPixelSize(R.dimen.finger_still_threshold);
+
 		glSurfaceView = (GLSurfaceView) findViewById(R.id.main_gl_surface);
 		glSurfaceView.setOnTouchListener(new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent e) {
@@ -118,6 +144,11 @@ public class MainActivity extends Activity implements View.OnTouchListener
 						AndroidDisplay.putMouseEventWithCoords((byte) 0, (byte) 1, x, y,
 							0, System.nanoTime());
 						AndroidDisplay.mouseLeft = true;
+						if (AndroidDisplay.grab) {
+							initialX = x;
+							initialY = y;
+							theHandler.sendEmptyMessageDelayed(MSG_LEFT_MOUSE_BUTTON_CHECK, 500);
+						}
 						break;
 					case MotionEvent.ACTION_UP:
 					case MotionEvent.ACTION_POINTER_UP:
@@ -125,6 +156,17 @@ public class MainActivity extends Activity implements View.OnTouchListener
 						AndroidDisplay.putMouseEventWithCoords((byte) 0, (byte) 0, x, y,
 							0, System.nanoTime());
 						AndroidDisplay.mouseLeft = false;
+						if (AndroidDisplay.grab) {
+							if (!triggeredLeftMouseButton &&
+								Math.abs(initialX - x) < fingerStillThreshold &&
+								Math.abs(initialY - y) < fingerStillThreshold) {
+								sendMouseButton(1, true);
+								sendMouseButton(1, false);
+							}
+							if (triggeredLeftMouseButton) sendMouseButton(0, false);
+							triggeredLeftMouseButton = false;
+							theHandler.removeMessages(MSG_LEFT_MOUSE_BUTTON_CHECK);
+						}
 						break;
 				}
 				return true;
