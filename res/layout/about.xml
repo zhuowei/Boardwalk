@@ -26,6 +26,12 @@
         android:text="@string/about_librarycredits"/>
 
     <TextView
+        android:id="@+id/about_contributorcreditstext"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Thanks to jose-vm, sjwoo1210, bmx22c, MCMrARM, and others for their contributions to Boardwalk."/>
+
+    <TextView
         android:id="@+id/about_copyrighttext"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

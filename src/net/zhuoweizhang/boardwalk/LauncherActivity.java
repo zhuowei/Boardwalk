@@ -171,9 +171,9 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(getResources().getString(R.string.about_app));
-		if (Build.VERSION.SDK_INT >= 16) { // Jelly Bean
+		/*if (Build.VERSION.SDK_INT >= 16) { // Jelly Bean
 			menu.add(getResources().getString(R.string.export_log));
-		}
+		}*/
 		return true;
 	}
 

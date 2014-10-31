@@ -14,7 +14,7 @@ import net.zhuoweizhang.boardwalk.util.*;
 
 public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 
-	public static final int MY_VERSION = 5;
+	public static final int MY_VERSION = 6;
 
 	private Context context;
 	private boolean forceDex;
