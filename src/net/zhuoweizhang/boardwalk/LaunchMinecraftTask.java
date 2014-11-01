@@ -14,11 +14,12 @@ import net.zhuoweizhang.boardwalk.util.*;
 
 public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 
-	public static final int MY_VERSION = 6;
+	public static final int MY_VERSION = 7;
 
 	private Context context;
 	private boolean forceDex;
 	private Listener listener;
+	private Thread assetsThread;
 
 	public LaunchMinecraftTask(Context context, Listener listener) {
 		this.context = context;
@@ -39,10 +40,13 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 			MinecraftVersion version = getMinecraftVersion(MainActivity.VERSION_TO_LAUNCH);
 			System.out.println("Can use existing dex pack: " + MinecraftLaunch.canUseExistingDexPack(version));
 			if (forceDex || !MinecraftLaunch.canUseExistingDexPack(version)) {
+				// for now we kickstart the assets downloader here.
+				startAssetsDownload(version);
 				populateWorkingDir();
 				downloadLibraries(version);
 				downloadMinecraft(version);
 				dexOptMinecraft(version);
+				waitForAssetsDownload();
 			}
 			extractDefaultOptions();
 		} catch (Exception e) {
@@ -143,6 +147,29 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 		File nomediaFile = new File(boardwalkDir, ".nomedia");
 		if (!nomediaFile.exists()) {
 			nomediaFile.createNewFile();
+		}
+	}
+
+	private void startAssetsDownload(MinecraftVersion version) {
+		final String assetsVersion = version.assets;
+		assetsThread = new Thread(new Runnable() {
+			public void run() {
+				try {
+					MinecraftAssetsDownloader.downloadAssets(assetsVersion, new File("/sdcard/boardwalk/gamedir/assets"));
+				} catch (IOException ie) {
+					ie.printStackTrace();
+				}
+			}
+		});
+		assetsThread.start();
+	}
+
+	private void waitForAssetsDownload() {
+		publishProgress("Waiting for sound and language files to download...");
+		try {
+			assetsThread.join();
+		} catch (InterruptedException ie) {
+			ie.printStackTrace();
 		}
 	}
 
