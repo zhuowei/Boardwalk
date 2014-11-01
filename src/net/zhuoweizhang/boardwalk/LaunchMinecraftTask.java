@@ -14,7 +14,7 @@ import net.zhuoweizhang.boardwalk.util.*;
 
 public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 
-	public static final int MY_VERSION = 7;
+	public static final int MY_VERSION = 8;
 
 	private Context context;
 	private boolean forceDex;
@@ -39,15 +39,14 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 			// todo login
 			MinecraftVersion version = getMinecraftVersion(MainActivity.VERSION_TO_LAUNCH);
 			System.out.println("Can use existing dex pack: " + MinecraftLaunch.canUseExistingDexPack(version));
+			startAssetsDownload(version);
 			if (forceDex || !MinecraftLaunch.canUseExistingDexPack(version)) {
-				// for now we kickstart the assets downloader here.
-				startAssetsDownload(version);
 				populateWorkingDir();
 				downloadLibraries(version);
 				downloadMinecraft(version);
 				dexOptMinecraft(version);
-				waitForAssetsDownload();
 			}
+			waitForAssetsDownload();
 			extractDefaultOptions();
 		} catch (Exception e) {
 			e.printStackTrace();

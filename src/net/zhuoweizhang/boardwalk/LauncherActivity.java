@@ -127,9 +127,9 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		if (PlatformUtils.getNumCores() < 2) {
 			builder.append(getResources().getText(R.string.recommendation_dual_core)).append("\n");
 		}
-		if (PlatformUtils.getTotalMemory() < (900000L * 1024L)) { // 900MB
+		/*if (PlatformUtils.getTotalMemory() < (900000L * 1024L)) { // 900MB
 			builder.append(getResources().getText(R.string.recommendation_memory)).append("\n");
-		}
+		}*/
 		if (DalvikTweaks.isDalvik() && new File("/system/lib/libart.so").exists()) {
 			builder.append(getResources().getText(R.string.recommendation_art)).append("\n");
 		}
