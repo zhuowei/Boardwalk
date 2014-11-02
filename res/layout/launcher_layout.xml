@@ -45,6 +45,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/login_import_credentials"/>
+    <Button android:id="@+id/launcher_import_resource_pack_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/login_import_resource_pack"/>
     <ProgressBar android:id="@+id/launcher_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

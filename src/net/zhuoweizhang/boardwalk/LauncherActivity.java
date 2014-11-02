@@ -28,10 +28,12 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	public boolean isLaunching = false;
 	public Button logoutButton;
 	public Button importCredentialsButton;
+	public Button importResourcePackButton;
 
 	private AdView adView;
 
 	public static final int REQUEST_BROWSE_FOR_CREDENTIALS = 1013; // date when this constant was added
+	public static final int REQUEST_BROWSE_FOR_RESOURCE_PACK = 1014;
 
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -49,6 +51,8 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		logoutButton.setOnClickListener(this);
 		importCredentialsButton = (Button) findViewById(R.id.launcher_import_credentials_button);
 		importCredentialsButton.setOnClickListener(this);
+		importResourcePackButton = (Button) findViewById(R.id.launcher_import_resource_pack_button);
+		importResourcePackButton.setOnClickListener(this);
 		updateUiWithLoginStatus();
 		updateRecommendationText();
 		initAds();
@@ -95,6 +99,8 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			doLogout();
 		} else if (v == importCredentialsButton) {
 			doBrowseForCredentials();
+		} else if (v == importResourcePackButton) {
+			doBrowseForResourcePack();
 		}
 	}
 
@@ -111,6 +117,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		logoutButton.setVisibility(View.GONE);
 		playButton.setVisibility(View.GONE);
 		importCredentialsButton.setVisibility(View.GONE);
+		importResourcePackButton.setVisibility(View.GONE);
 		new LaunchMinecraftTask(this, this).execute();
 	}
 
@@ -163,6 +170,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	public void onLaunchError() {
 		isLaunching = false;
 		playButton.setVisibility(View.VISIBLE);
+		importResourcePackButton.setVisibility(View.VISIBLE);
 		adView.resume();
 		adView.setVisibility(View.VISIBLE);
 		progressBar.setVisibility(View.GONE);
@@ -215,6 +223,13 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 					new ImportVanillaAuthTask(this).execute(file.getAbsolutePath());
 				}
 				break;
+			case REQUEST_BROWSE_FOR_RESOURCE_PACK:
+				if (resultCode == RESULT_OK) {
+					final Uri uri = data.getData();
+					File file = FileUtils.getFile(uri);
+					new ImportResourcePackTask(this).execute(file);
+				}
+				break;
 			default:
 				super.onActivityResult(requestCode, resultCode, data);
 				break;
@@ -230,4 +245,13 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			// Sigh.
 		}
 	}
+
+	private void doBrowseForResourcePack() {
+		Intent target = FileUtils.createGetContentIntent();
+		target.setType("application/zip");
+		target.setClass(LauncherActivity.this, FileChooserActivity.class);
+
+		startActivityForResult(target, REQUEST_BROWSE_FOR_RESOURCE_PACK);
+	}
+
 }
