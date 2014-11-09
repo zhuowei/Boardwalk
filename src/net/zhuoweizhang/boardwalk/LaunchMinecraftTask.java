@@ -36,8 +36,9 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 		try {
 			setupWorkingDir(context);
 			forceDex = getLauncherDirVersion() != MY_VERSION || new File("/sdcard/boardwalk/dexme").exists();
-			// todo login
-			MinecraftVersion version = getMinecraftVersion(MainActivity.VERSION_TO_LAUNCH);
+			String selectedVersion = context.getSharedPreferences("launcher_prefs", 0).
+				getString("selected_version", MainActivity.VERSION_TO_LAUNCH);
+			MinecraftVersion version = getMinecraftVersion(selectedVersion);
 			System.out.println("Can use existing dex pack: " + MinecraftLaunch.canUseExistingDexPack(version));
 			startAssetsDownload(version);
 			if (forceDex || !MinecraftLaunch.canUseExistingDexPack(version)) {
@@ -74,8 +75,8 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 	private void populateWorkingDir() throws IOException {
 		publishProgress(context.getResources().getString(R.string.convert_populating_working_directory));
 		File dexLibDir = MinecraftLaunch.dexDir;
-		if (forceDex) {
-			IoUtil.clearDirectory(dexLibDir);
+		if (true) {
+			if (forceDex) IoUtil.clearDirectory(dexLibDir);
 			AssetsUtil.extractDirFromAssets(context, "dexed_libraries", dexLibDir);
 			AssetsUtil.extractFileFromAssets(context, "jarjarrules.txt", new File(MinecraftLaunch.launcherDir,
 				"jarjarrules.txt"));

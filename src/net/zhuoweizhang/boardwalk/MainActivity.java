@@ -193,7 +193,9 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				System.out.println("Gave up context: " + AndroidContextImplementation.context);
 				//File dexOut = new File("/sdcard/boardwalk/testcases_final.jar");
 				//runCraft(dexOut);
-				runCraft2(MainActivity.this, VERSION_TO_LAUNCH);
+				String selectedVersion = getSharedPreferences("launcher_prefs", 0).
+					getString("selected_version", VERSION_TO_LAUNCH);
+				runCraft2(MainActivity.this, selectedVersion);
 				while (true) {
 					try {
 						Thread.sleep(0x7fffffff);
@@ -642,6 +644,9 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			// this one is for the API's built in logger; we only use this one,
 			// but we set the one above also, just in case.
 			System.setProperty("org.apache.logging.log4j.simplelog.level", "INFO");
+			// JarJar renames these properties for us, so also set the renamed versions
+			System.setProperty("net.zhuoweizhang.boardwalk.org.apache.logging.log4j.level", "INFO");
+			System.setProperty("net.zhuoweizhang.boardwalk.org.apache.logging.log4j.simplelog.level", "INFO");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

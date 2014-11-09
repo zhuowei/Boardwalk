@@ -49,6 +49,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/login_import_resource_pack"/>
+    <Spinner android:id="@+id/launcher_version_spinner"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"/>
     <ProgressBar android:id="@+id/launcher_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

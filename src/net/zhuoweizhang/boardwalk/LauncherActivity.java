@@ -1,6 +1,7 @@
 package net.zhuoweizhang.boardwalk;
 
 import java.io.File;
+import java.util.Arrays;
 
 import android.app.*;
 import android.content.*;
@@ -16,7 +17,10 @@ import com.google.android.gms.ads.*;
 
 import net.zhuoweizhang.boardwalk.util.PlatformUtils;
 
-public class LauncherActivity extends Activity implements View.OnClickListener, LaunchMinecraftTask.Listener {
+public class LauncherActivity extends Activity implements View.OnClickListener, LaunchMinecraftTask.Listener,
+	AdapterView.OnItemSelectedListener {
+
+	public static final String[] versionsSupported = {"1.7.10", "1.8"};
 
 	public TextView usernameText, passwordText;
 	public Button loginButton;
@@ -29,6 +33,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	public Button logoutButton;
 	public Button importCredentialsButton;
 	public Button importResourcePackButton;
+	public Spinner versionSpinner;
 
 	private AdView adView;
 
@@ -53,9 +58,15 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		importCredentialsButton.setOnClickListener(this);
 		importResourcePackButton = (Button) findViewById(R.id.launcher_import_resource_pack_button);
 		importResourcePackButton.setOnClickListener(this);
+		versionSpinner = (Spinner) findViewById(R.id.launcher_version_spinner);
+		versionSpinner.setOnItemSelectedListener(this);
+		updateVersionSpinner();
 		updateUiWithLoginStatus();
 		updateRecommendationText();
 		initAds();
+		if (new File("/sdcard/boardwalk/debugconsole").exists()) {
+			RemoteDebugConsole.start();
+		}
 	}
 
 	@Override
@@ -116,6 +127,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		loginButton.setVisibility(View.GONE);
 		logoutButton.setVisibility(View.GONE);
 		playButton.setVisibility(View.GONE);
+		versionSpinner.setVisibility(View.GONE);
 		importCredentialsButton.setVisibility(View.GONE);
 		importResourcePackButton.setVisibility(View.GONE);
 		new LaunchMinecraftTask(this, this).execute();
@@ -171,6 +183,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		isLaunching = false;
 		playButton.setVisibility(View.VISIBLE);
 		importResourcePackButton.setVisibility(View.VISIBLE);
+		versionSpinner.setVisibility(View.VISIBLE);
 		adView.resume();
 		adView.setVisibility(View.VISIBLE);
 		progressBar.setVisibility(View.GONE);
@@ -236,6 +249,26 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		}
 	}
 
+	public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+		if (parent == versionSpinner) {
+			String theVersion = versionsSupported[position];
+			SharedPreferences prefs = this.getSharedPreferences("launcher_prefs", 0);
+			prefs.edit().putString("selected_version", theVersion).apply();
+			System.out.println("Version: " + theVersion);
+			if (theVersion.equals("1.8") && DalvikTweaks.isDalvik()) {
+				new AlertDialog.Builder(this).setMessage("Minecraft 1.8 is unplayable on Dalvik due to severe lag" +
+					" and two-minute startup times. Please use a device with ART."+
+					" Launching 1.8 on Dalvik may work, but this is completely unsupported."+
+					" It is strongly recommended that you launch 1.7.10 instead.").
+					setPositiveButton(android.R.string.ok, null).
+					show();
+			}
+		}
+	}
+	public void onNothingSelected(AdapterView<?> parent) {
+	}
+
+
 	private void doExportLog() {
 		try {
 			Runtime.getRuntime().exec(new String[] {"logcat", "-d", "-f", "/sdcard/boardwalk/log.txt"});
@@ -252,6 +285,16 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		target.setClass(LauncherActivity.this, FileChooserActivity.class);
 
 		startActivityForResult(target, REQUEST_BROWSE_FOR_RESOURCE_PACK);
+	}
+
+	private void updateVersionSpinner() {
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, versionsSupported);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		versionSpinner.setAdapter(adapter);
+
+		String selectedVersion = getSharedPreferences("launcher_prefs", 0).
+			getString("selected_version", MainActivity.VERSION_TO_LAUNCH);
+		versionSpinner.setSelection(Arrays.asList(versionSpinner).indexOf(selectedVersion));
 	}
 
 }
