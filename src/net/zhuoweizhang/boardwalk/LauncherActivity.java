@@ -2,6 +2,8 @@ package net.zhuoweizhang.boardwalk;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.app.*;
 import android.content.*;
@@ -34,6 +36,8 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	public Button importCredentialsButton;
 	public Button importResourcePackButton;
 	public Spinner versionSpinner;
+	public List<String> versionsStringList = new ArrayList<String>();
+	public ArrayAdapter<String> versionSpinnerAdapter;
 
 	private AdView adView;
 	private InterstitialAd interstitial;
@@ -280,8 +284,9 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 
 	public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 		if (parent == versionSpinner) {
-			String theVersion = versionsSupported[position];
+			String theVersion = versionsStringList.get(position);
 			SharedPreferences prefs = this.getSharedPreferences("launcher_prefs", 0);
+			if (prefs.getString("selected_version", MainActivity.VERSION_TO_LAUNCH).equals(theVersion)) return;
 			prefs.edit().putString("selected_version", theVersion).apply();
 			System.out.println("Version: " + theVersion);
 			if (theVersion.equals("1.8") && DalvikTweaks.isDalvik()) {
@@ -317,13 +322,27 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	}
 
 	private void updateVersionSpinner() {
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, versionsSupported);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		versionSpinner.setAdapter(adapter);
+		versionsStringList.addAll(Arrays.asList(versionsSupported));
+		versionSpinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, versionsStringList);
+		versionSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		versionSpinner.setAdapter(versionSpinnerAdapter);
 
 		String selectedVersion = getSharedPreferences("launcher_prefs", 0).
 			getString("selected_version", MainActivity.VERSION_TO_LAUNCH);
-		versionSpinner.setSelection(Arrays.asList(versionSpinner).indexOf(selectedVersion));
+		versionSpinner.setSelection(versionsStringList.indexOf(selectedVersion));
+		new RefreshVersionListTask(this).execute();
+	}
+
+	public void addToVersionSpinner(List<String> newVersions) {
+		String selectedVersion = getSharedPreferences("launcher_prefs", 0).
+			getString("selected_version", MainActivity.VERSION_TO_LAUNCH);
+		versionsStringList.clear();
+		versionsStringList.addAll(newVersions);
+
+		int selectedVersionIndex = versionsStringList.indexOf(selectedVersion);
+		System.out.println("Selected version: " + selectedVersion + " index: " + selectedVersionIndex);
+		versionSpinnerAdapter.notifyDataSetChanged();
+		versionSpinner.setSelection(selectedVersionIndex);
 	}
 
 	private void enableLaunchButton() {
