@@ -6,6 +6,8 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.security.*;
 
+import javax.crypto.Cipher;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -533,25 +535,28 @@ public class MainActivity extends Activity implements View.OnTouchListener
 
 	public static void fixRSAPadding(File spongyFile, File optDir) throws Exception {
 		// welcome to the territory of YOLO; I'll be your tour guide for today.
-		System.out.println("Before: " + KeyFactory.getInstance("RSA") + ":" + KeyFactory.getInstance("RSA").getProvider());
+/*		System.out.println("Before: " + KeyFactory.getInstance("RSA") + ":" + KeyFactory.getInstance("RSA").getProvider());
 		DexClassLoader classLoader = new DexClassLoader(spongyFile.getAbsolutePath(),
 			optDir.getAbsolutePath(), null, MainActivity.class.getClassLoader());
 		Class<?> clazz = classLoader.loadClass("org.spongycastle.jce.provider.BouncyCastleProvider");
 		Security.insertProviderAt((Provider) clazz.newInstance(), 1);
-		System.out.println("After: " + KeyFactory.getInstance("RSA") + ":" + KeyFactory.getInstance("RSA").getProvider());
-/*		KeyFactory.getInstance("RSA");
+		System.out.println("After: " + KeyFactory.getInstance("RSA") + ":" + KeyFactory.getInstance("RSA").getProvider());*/
+		System.out.println(Cipher.getInstance("RSA"));
+		System.out.println(Cipher.getInstance("RSA/ECB/PKCS1Padding"));
 		Class<?> clazz = Class.forName("org.apache.harmony.security.fortress.Services");
 		Method method = clazz.getMethod("getServices", String.class);
 		ArrayList<Provider.Service> rsaList = (ArrayList<Provider.Service>)
-			method.invoke(null, "KeyFactory.RSA");
+			method.invoke(null, "Cipher.RSA");
 		System.out.println("Before: " + rsaList);
 		ArrayList<Provider.Service> rsaPkcs1List = (ArrayList<Provider.Service>)
-			method.invoke(null, "KeyFactory.RSA//PKCS1PADDING");
+			method.invoke(null, "Cipher.RSA/ECB/PKCS1PADDING");
+		System.out.println(rsaPkcs1List);
 		rsaList.clear();
 		rsaList.addAll(rsaPkcs1List);
 		System.out.println("After: " + rsaList);
+		//System.out.println("After: " + KeyFactory.getInstance("RSA") + ":" + KeyFactory.getInstance("RSA").getProvider());
 
-		Provider provider = KeyFactory.getInstance("RSA").getProvider();
+/*		Provider provider = KeyFactory.getInstance("RSA").getProvider();
 		System.out.println("Before: " + provider.getService("KeyService", "RSA"));
 		Provider.Service service = provider.getService("KeyService", "RSA/ECB/PKCS5Padding");
 		System.out.println(service);
@@ -589,6 +594,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				applicationInfo.nativeLibraryDir;
 			DexClassLoader classLoader = new DexClassLoader(MinecraftLaunch.getClassPath(version), 
 				optDir.getAbsolutePath(), nativePath, MainActivity.class.getClassLoader());
+			fixRSAPadding(null, null);
 
 			Class<?> clazz = null;
 			try {
