@@ -28,7 +28,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	public ProgressBar progressBar;
 	public Button playButton;
 	public TextView recommendationText;
-	public boolean refreshedToken = true; // TODO false;
+	public boolean refreshedToken = false;
 	public boolean isLaunching = false;
 	public Button logoutButton;
 	public Button importCredentialsButton;
@@ -36,9 +36,17 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	public Spinner versionSpinner;
 
 	private AdView adView;
+	private InterstitialAd interstitial;
 
 	public static final int REQUEST_BROWSE_FOR_CREDENTIALS = 1013; // date when this constant was added
 	public static final int REQUEST_BROWSE_FOR_RESOURCE_PACK = 1014;
+
+	private Handler handler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			enableLaunchButton();
+		}
+	};
 
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -63,6 +71,8 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		updateVersionSpinner();
 		updateUiWithLoginStatus();
 		updateRecommendationText();
+		playButton.setEnabled(false);
+		handler.sendEmptyMessageDelayed(1337, 1000*30); // 30 seconds
 		initAds();
 		if (new File("/sdcard/boardwalk/debugconsole").exists()) {
 			RemoteDebugConsole.start();
@@ -105,7 +115,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		if (v == loginButton) {
 			doLogin();
 		} else if (v == playButton) {
-			doLaunch();
+			doPreLaunch();
 		} else if (v == logoutButton) {
 			doLogout();
 		} else if (v == importCredentialsButton) {
@@ -117,6 +127,15 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 
 	public void doLogin() {
 		new LoginTask(this).execute(usernameText.getText().toString(), passwordText.getText().toString());
+	}
+
+	public void doPreLaunch() {
+		// Do we have an interstitial loaded?
+		if (interstitial.isLoaded()) {
+			interstitial.show();
+		} else {
+			doLaunch();
+		}
 	}
 
 	public void doLaunch() {
@@ -163,6 +182,15 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER_L)
 			.build();
 		adView.loadAd(adRequest);
+		interstitial = new InterstitialAd(this);
+		interstitial.setAdUnitId("ca-app-pub-2652482030334356/4318313426");
+		AdRequest adRequest2 = new AdRequest.Builder()
+			.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER)
+			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER_L)
+			.build();
+		interstitial.setAdListener(new LauncherAdListener());
+		interstitial.loadAd(adRequest2);
 	}
 
 	public void onBackPressed() {
@@ -295,6 +323,22 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		String selectedVersion = getSharedPreferences("launcher_prefs", 0).
 			getString("selected_version", MainActivity.VERSION_TO_LAUNCH);
 		versionSpinner.setSelection(Arrays.asList(versionSpinner).indexOf(selectedVersion));
+	}
+
+	private void enableLaunchButton() {
+		playButton.setEnabled(true);
+	}
+
+	private class LauncherAdListener extends AdListener {
+		public void onAdClosed() {
+			doLaunch();
+		}
+		public void onAdFailedToLoad(int error) {
+			enableLaunchButton();
+		}
+		public void onAdLoaded() {
+			enableLaunchButton();
+		}
 	}
 
 }
