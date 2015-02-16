@@ -74,6 +74,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		playButton.setEnabled(false);
 		handler.sendEmptyMessageDelayed(1337, 1000*30); // 30 seconds
 		initAds();
+		refreshToken();
 		if (new File("/sdcard/boardwalk/debugconsole").exists()) {
 			RemoteDebugConsole.start();
 		}
@@ -327,6 +328,11 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 
 	private void enableLaunchButton() {
 		playButton.setEnabled(true);
+	}
+
+	private void refreshToken() {
+		if (!isLoggedIn()) return;
+		new RefreshAuthTokenTask(this).execute();
 	}
 
 	private class LauncherAdListener extends AdListener {
