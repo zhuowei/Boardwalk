@@ -199,7 +199,7 @@ public class MinecraftLaunch {
 	}
 
 	public static void runDex(List<File> dexInFiles, File dexOut) {
-		List<String> dexArgs = Arrays.asList("--num-threads=4", "--no-optimize", "--debug");
+		List<String> dexArgs = Arrays.asList("--num-threads=4", "--debug");
 		if (!javaVMCmd.get(0).equals("dalvikvm")) dexArgs = Arrays.asList("--num-threads=4", "--debug");
 		runDex(dexInFiles, dexOut, dexArgs);
 	}

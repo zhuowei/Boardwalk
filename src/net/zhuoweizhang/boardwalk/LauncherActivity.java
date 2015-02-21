@@ -323,12 +323,13 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 
 	private void updateVersionSpinner() {
 		versionsStringList.addAll(Arrays.asList(versionsSupported));
+		String selectedVersion = getSharedPreferences("launcher_prefs", 0).
+			getString("selected_version", MainActivity.VERSION_TO_LAUNCH);
+		if (!versionsStringList.contains(selectedVersion)) versionsStringList.add(selectedVersion);
 		versionSpinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, versionsStringList);
 		versionSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		versionSpinner.setAdapter(versionSpinnerAdapter);
 
-		String selectedVersion = getSharedPreferences("launcher_prefs", 0).
-			getString("selected_version", MainActivity.VERSION_TO_LAUNCH);
 		versionSpinner.setSelection(versionsStringList.indexOf(selectedVersion));
 		new RefreshVersionListTask(this).execute();
 	}

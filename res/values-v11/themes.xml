@@ -1,4 +1,10 @@
 <resources>
     <style name="FullscreenTheme" parent="@android:style/Theme.Holo.NoActionBar.Fullscreen">
     </style>
+    <style name="BoardwalkTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/BoardwalkActionBarStyle</item>
+    </style>
+    <style name="BoardwalkActionBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/theme_primary</item>
+    </style>
 </resources>
