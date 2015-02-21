@@ -7,7 +7,7 @@
     <string name="login_logging_in">Logging in&#8230;</string>
     <string name="login_error">Unable to login:</string>
     <string name="login_button">Login</string>
-    <string name="login_extra_info_text">This version of Boardwalk is very experimental - world generation may take up to 5 minutes, multiplayer only works on offline servers, and putting this application in the background causes Minecraft to crash.\n
+    <string name="login_extra_info_text">This version of Boardwalk is very experimental - world generation may take up to 5 minutes, and putting this application in the background causes Minecraft to crash.\n
 These issues are being investigated and may be fixed in a later version.
 </string>
     <string name="login_import_credentials">Import credentials from launcher_profiles.json</string>

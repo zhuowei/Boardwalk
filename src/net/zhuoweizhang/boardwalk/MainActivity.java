@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
@@ -72,6 +73,8 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	private int initialX, initialY;
 	private static final int MSG_LEFT_MOUSE_BUTTON_CHECK = 1028;
 	private int fingerStillThreshold = 8;
+	private boolean rightOverride = false;
+	private Drawable secondaryButtonDefaultBackground, secondaryButtonColorBackground;
 
 	private Handler theHandler = new Handler() {
 		public void handleMessage(Message msg) {
@@ -129,6 +132,8 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		talkButton = findButton(R.id.control_talk);
 		thirdPersonButton = findButton(R.id.control_thirdperson);
 		overlayView = (ViewGroup) findViewById(R.id.main_control_overlay);
+		secondaryButtonDefaultBackground = secondaryButton.getBackground();
+		secondaryButtonColorBackground = new ColorDrawable(0xffff0000);
 
 		registerShutdownHook();
 
@@ -145,9 +150,13 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				switch (e.getActionMasked()) {
 					case MotionEvent.ACTION_DOWN:
 					case MotionEvent.ACTION_POINTER_DOWN:
-						AndroidDisplay.putMouseEventWithCoords((byte) 0, (byte) 1, x, y,
+						AndroidDisplay.putMouseEventWithCoords(rightOverride? (byte) 1: (byte) 0, (byte) 1, x, y,
 							0, System.nanoTime());
-						AndroidDisplay.mouseLeft = true;
+						if (!rightOverride) {
+							AndroidDisplay.mouseLeft = true;
+						} else {
+							//AndroidDisplay.mouseRight = true;
+						}
 						if (AndroidDisplay.grab) {
 							initialX = x;
 							initialY = y;
@@ -157,9 +166,13 @@ public class MainActivity extends Activity implements View.OnTouchListener
 					case MotionEvent.ACTION_UP:
 					case MotionEvent.ACTION_POINTER_UP:
 					case MotionEvent.ACTION_CANCEL:
-						AndroidDisplay.putMouseEventWithCoords((byte) 0, (byte) 0, x, y,
+						AndroidDisplay.putMouseEventWithCoords(rightOverride? (byte) 1: (byte) 0, (byte) 0, x, y,
 							0, System.nanoTime());
-						AndroidDisplay.mouseLeft = false;
+						if (!rightOverride) {
+							AndroidDisplay.mouseLeft = false;
+						} else {
+							//AndroidDisplay.mouseRight = false;
+						}
 						if (AndroidDisplay.grab) {
 							if (!triggeredLeftMouseButton &&
 								Math.abs(initialX - x) < fingerStillThreshold &&
@@ -267,7 +280,11 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		} else if (v == primaryButton) {
 			sendMouseButton(0, isDown);
 		} else if (v == secondaryButton) {
-			sendMouseButton(1, isDown);
+			if (AndroidDisplay.grab) {
+				sendMouseButton(1, isDown);
+			} else {
+				setRightOverride(isDown);
+			}
 		} else if (v == debugButton) {
 			sendKeyPress(Keyboard.KEY_F3, isDown);
 		} else if (v == shiftButton) {
@@ -441,6 +458,11 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			}
 		});
 		Runtime.getRuntime().addShutdownHook(shutdownThread);
+	}
+
+	private void setRightOverride(boolean val) {
+		rightOverride = val;
+		secondaryButton.setBackground(rightOverride? secondaryButtonColorBackground: secondaryButtonDefaultBackground);
 	}
 
 	public static List<File> runRenameLibs(File rulesFile, List<File> inFiles) {
