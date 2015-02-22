@@ -462,7 +462,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 
 	private void setRightOverride(boolean val) {
 		rightOverride = val;
-		secondaryButton.setBackground(rightOverride? secondaryButtonColorBackground: secondaryButtonDefaultBackground);
+		secondaryButton.setBackgroundDrawable(rightOverride? secondaryButtonColorBackground: secondaryButtonDefaultBackground);
 	}
 
 	public static List<File> runRenameLibs(File rulesFile, List<File> inFiles) {
@@ -566,16 +566,20 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		System.out.println(Cipher.getInstance("RSA"));
 		System.out.println(Cipher.getInstance("RSA/ECB/PKCS1Padding"));
 		Class<?> clazz = Class.forName("org.apache.harmony.security.fortress.Services");
-		Method method = clazz.getMethod("getServices", String.class);
-		ArrayList<Provider.Service> rsaList = (ArrayList<Provider.Service>)
-			method.invoke(null, "Cipher.RSA");
-		System.out.println("Before: " + rsaList);
-		ArrayList<Provider.Service> rsaPkcs1List = (ArrayList<Provider.Service>)
-			method.invoke(null, "Cipher.RSA/ECB/PKCS1PADDING");
-		System.out.println(rsaPkcs1List);
-		rsaList.clear();
-		rsaList.addAll(rsaPkcs1List);
-		System.out.println("After: " + rsaList);
+		try {
+			Method method = clazz.getMethod("getServices", String.class);
+			ArrayList<Provider.Service> rsaList = (ArrayList<Provider.Service>)
+				method.invoke(null, "Cipher.RSA");
+			ArrayList<Provider.Service> rsaPkcs1List = (ArrayList<Provider.Service>)
+				method.invoke(null, "Cipher.RSA/ECB/PKCS1PADDING");
+			rsaList.clear();
+			rsaList.addAll(rsaPkcs1List);
+		} catch (NoSuchMethodException nsme) { // 4.4.2 and below
+			Field servicesField = clazz.getDeclaredField("services");
+			servicesField.setAccessible(true);
+			Map<String, Provider.Service> services = (Map<String, Provider.Service>) servicesField.get(null);
+			services.put("Cipher.RSA", services.get("Cipher.RSA/ECB/PKCS1PADDING"));
+		}
 		//System.out.println("After: " + KeyFactory.getInstance("RSA") + ":" + KeyFactory.getInstance("RSA").getProvider());
 
 /*		Provider provider = KeyFactory.getInstance("RSA").getProvider();
