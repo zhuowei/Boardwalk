@@ -40,6 +40,7 @@ import javax.microedition.khronos.egl.EGLContext;
 
 import net.zhuoweizhang.boardwalk.downloader.*;
 import net.zhuoweizhang.boardwalk.model.*;
+import net.zhuoweizhang.boardwalk.potato.*;
 import net.zhuoweizhang.boardwalk.util.*;
 
 public class MainActivity extends Activity implements View.OnTouchListener
@@ -75,14 +76,17 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	private int fingerStillThreshold = 8;
 	private boolean rightOverride = false;
 	private Drawable secondaryButtonDefaultBackground, secondaryButtonColorBackground;
+	private File runtimeDir;
+	private InputEventSender inputSender;
+	private int mouseX, mouseY, windowWidth, windowHeight;
 
 	private Handler theHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 				case MSG_LEFT_MOUSE_BUTTON_CHECK: {
-					int x = AndroidDisplay.mouseX;
-					int y = AndroidDisplay.mouseY;
-					if (AndroidDisplay.grab &&
+					int x = mouseX;
+					int y = mouseY;
+					if (inputSender.grab &&
 						Math.abs(initialX - x) < fingerStillThreshold &&
 						Math.abs(initialY - y) < fingerStillThreshold) {
 						triggeredLeftMouseButton = true;
@@ -98,24 +102,13 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
-		/* Preconditions: 
-		 * The Launcher Activity should have built the finished dex from the libraries and the Minecraft jar.
-		 * The final dex path should be passed in as an Intent.
-		 */
+
+		/* Preconditions: root FS extracted (by launcher activity) */
 		super.onCreate(savedInstanceState);
-		LaunchMinecraftTask.setupWorkingDir(this);
-		initEnvs();
-		if (DalvikTweaks.isDalvik()) {
-			DalvikTweaks.setDefaultStackSize(512 * 1024);
-		}
-		System.loadLibrary("glshim");
 
 		displayMetrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-		//AndroidDisplay.windowWidth = displayMetrics.widthPixels;
-		//AndroidDisplay.windowHeight = displayMetrics.heightPixels;
 
-		//glSurfaceView = new GLSurfaceView(this);
 		setContentView(R.layout.main);
 
 		upButton = findButton(R.id.control_up);
@@ -135,9 +128,16 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		secondaryButtonDefaultBackground = secondaryButton.getBackground();
 		secondaryButtonColorBackground = new ColorDrawable(0xffff0000);
 
-		registerShutdownHook();
-
 		fingerStillThreshold = getResources().getDimensionPixelSize(R.dimen.finger_still_threshold);
+
+		runtimeDir = getDir("runtime", 0);
+		try {
+			inputSender = new InputEventSender();
+			int inputSenderPort = inputSender.runServer();
+			LoadMe.setenv("INPUT_SENDER_PORT", Integer.toString(inputSenderPort));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		glSurfaceView = (GLSurfaceView) findViewById(R.id.main_gl_surface);
 		glSurfaceView.setOnTouchListener(new View.OnTouchListener() {
@@ -145,19 +145,22 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				int x = ((int) e.getX()) / scaleFactor;
 				int y = (glSurfaceView.getHeight() - (int) e.getY()) / scaleFactor;
 				if (handleGuiBar(x, y, e)) return true;
-				AndroidDisplay.mouseX = x;
-				AndroidDisplay.mouseY = y;
+				inputSender.setMouseCoords(x, y);
+				mouseX = x;
+				mouseY = y;
 				switch (e.getActionMasked()) {
 					case MotionEvent.ACTION_DOWN:
 					case MotionEvent.ACTION_POINTER_DOWN:
-						AndroidDisplay.putMouseEventWithCoords(rightOverride? (byte) 1: (byte) 0, (byte) 1, x, y,
+						inputSender.putMouseEventWithCoords(rightOverride? (byte) 1: (byte) 0, (byte) 1, x, y,
 							0, System.nanoTime());
+						/*
 						if (!rightOverride) {
 							AndroidDisplay.mouseLeft = true;
 						} else {
 							//AndroidDisplay.mouseRight = true;
 						}
-						if (AndroidDisplay.grab) {
+						*/
+						if (inputSender.grab) {
 							initialX = x;
 							initialY = y;
 							theHandler.sendEmptyMessageDelayed(MSG_LEFT_MOUSE_BUTTON_CHECK, 500);
@@ -166,14 +169,16 @@ public class MainActivity extends Activity implements View.OnTouchListener
 					case MotionEvent.ACTION_UP:
 					case MotionEvent.ACTION_POINTER_UP:
 					case MotionEvent.ACTION_CANCEL:
-						AndroidDisplay.putMouseEventWithCoords(rightOverride? (byte) 1: (byte) 0, (byte) 0, x, y,
+						inputSender.putMouseEventWithCoords(rightOverride? (byte) 1: (byte) 0, (byte) 0, x, y,
 							0, System.nanoTime());
+						/*
 						if (!rightOverride) {
 							AndroidDisplay.mouseLeft = false;
 						} else {
 							//AndroidDisplay.mouseRight = false;
 						}
-						if (AndroidDisplay.grab) {
+						*/
+						if (inputSender.grab) {
 							if (!triggeredLeftMouseButton &&
 								Math.abs(initialX - x) < fingerStillThreshold &&
 								Math.abs(initialY - y) < fingerStillThreshold) {
@@ -189,28 +194,26 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				return true;
 			}
 		});
+
 		glSurfaceView.setRenderer(new GLSurfaceView.Renderer() {
 			public void onDrawFrame(GL10 gl) {
 			}
 			public void onSurfaceCreated(GL10 gl, javax.microedition.khronos.egl.EGLConfig config) {
-				AndroidDisplay.windowWidth = glSurfaceView.getWidth() / scaleFactor;
-				AndroidDisplay.windowHeight = glSurfaceView.getHeight() / scaleFactor;
+				windowWidth = glSurfaceView.getWidth() / scaleFactor;
+				windowHeight = glSurfaceView.getHeight() / scaleFactor;
 				calculateMcScale();
-				System.out.println("WidthHeight: " + AndroidDisplay.windowWidth + ":" + AndroidDisplay.windowHeight);
-				EGL10 theEgl = (EGL10) EGLContext.getEGL();
-				AndroidContextImplementation.theEgl = theEgl;
-				AndroidContextImplementation.context = theEgl.eglGetCurrentContext();
-				AndroidContextImplementation.display = theEgl.eglGetCurrentDisplay();
-				AndroidContextImplementation.read = theEgl.eglGetCurrentSurface(EGL10.EGL_READ);
-				AndroidContextImplementation.draw = theEgl.eglGetCurrentSurface(EGL10.EGL_DRAW);
-				theEgl.eglMakeCurrent(AndroidContextImplementation.display, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE,
-					EGL10.EGL_NO_CONTEXT);
-				System.out.println("Gave up context: " + AndroidContextImplementation.context);
-				//File dexOut = new File("/sdcard/boardwalk/testcases_final.jar");
-				//runCraft(dexOut);
+				System.out.println("WidthHeight: " + windowWidth + ":" + windowHeight);
+
 				String selectedVersion = getSharedPreferences("launcher_prefs", 0).
 					getString("selected_version", VERSION_TO_LAUNCH);
-				runCraft2(MainActivity.this, selectedVersion);
+
+				EGL10 theEgl = (EGL10) EGLContext.getEGL();
+				LoadMe.setupBridgeEGL();
+				theEgl.eglMakeCurrent(theEgl.eglGetCurrentDisplay(), EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE,
+					EGL10.EGL_NO_CONTEXT);
+				LoadMe.runtimePath = runtimeDir.getAbsolutePath();
+				new Thread(new PotatoRunner()).start();
+
 				while (true) {
 					try {
 						Thread.sleep(0x7fffffff);
@@ -221,28 +224,6 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			}
 		});
 		glSurfaceView.requestRender();
-		/*File jarjarIn = new File("/sdcard/boardwalk/testcases.jar");
-		File dexOut = new File("/sdcard/boardwalk/testcases_dexed.jar");
-		if (new File("/sdcard/boardwalk/dexme").exists()) {
-			long beginTime = System.currentTimeMillis();
-			//runRename(new File("/sdcard/boardwalk/jarjarrules.txt"), jarjarIn, dexIn);
-			//System.out.println("Rename done in " + (System.currentTimeMillis() - beginTime) + " ms");
-			//System.gc();
-			List<File> dexInFiles = new ArrayList<File>();
-			dexInFiles.addAll(Arrays.asList(new File("/sdcard/boardwalk/dexin/").listFiles()));
-			dexInFiles.add(jarjarIn);
-			dexInFiles = runRenameLibs(new File("/sdcard/boardwalk/jarjarrules.txt"), dexInFiles);
-			runDex(this, dexInFiles, dexOut);
-			try {
-				CleanZipUtil.process(dexOut, new File("/sdcard/boardwalk/testcases_final.jar"));
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-			System.out.println("Dex done in " + (System.currentTimeMillis() - beginTime) + " ms");
-			new File("/sdcard/boardwalk/dexme").delete();
-		}
-		//runCraft(dexOut);
-		//runTest(dexOut, "ImageIOTest");*/
 	}
 
 	private Button findButton(int id) {
@@ -280,7 +261,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		} else if (v == primaryButton) {
 			sendMouseButton(0, isDown);
 		} else if (v == secondaryButton) {
-			if (AndroidDisplay.grab) {
+			if (inputSender.grab) {
 				sendMouseButton(1, isDown);
 			} else {
 				setRightOverride(isDown);
@@ -308,11 +289,11 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	}
 
 	private void sendKeyPress(int keyCode, char keyChar, boolean status) {
-		AndroidDisplay.setKey(keyCode, keyChar, status);
+		inputSender.setKey(keyCode, keyChar, status);
 	}
 
 	private void sendMouseButton(int button, boolean status) {
-		AndroidDisplay.setMouseButtonInGrabMode((byte) button, status? (byte) 1: (byte) 0);
+		inputSender.setMouseButtonInGrabMode((byte) button, status? (byte) 1: (byte) 0);
 	}
 
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -349,8 +330,8 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		// if rendering unicode and on an odd scale factor
 		// decrease scale factor
 		int scale = 1;
-		int screenWidth = AndroidDisplay.windowWidth;
-		int screenHeight = AndroidDisplay.windowHeight;
+		int screenWidth = windowWidth;
+		int screenHeight = windowHeight;
 
 		while(screenWidth / (scale + 1) >= 320 && screenHeight / (scale + 1) >= 240) {
 			scale++;
@@ -364,7 +345,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	}
 
 	public boolean handleGuiBar(int x, int y, MotionEvent e) {
-		if (!AndroidDisplay.grab) return false;
+		if (!inputSender.grab) return false;
 		boolean isDown;
 		switch (e.getActionMasked()) {
 			case MotionEvent.ACTION_DOWN:
@@ -379,8 +360,8 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			default:
 				return false;
 		}
-		int screenWidth = AndroidDisplay.windowWidth;
-		int screenHeight = AndroidDisplay.windowHeight;
+		int screenWidth = windowWidth;
+		int screenHeight = windowHeight;
 		int barheight = mcscale(20);
 		int barwidth = mcscale(180);
 		int barx = (screenWidth / 2) - (barwidth / 2);
@@ -448,169 +429,12 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		imm.showSoftInput(getWindow().getDecorView(), InputMethodManager.SHOW_FORCED);
 	}
 
-	private void registerShutdownHook() {
-		Thread shutdownThread = new Thread(new Runnable() {
-			public void run() {
-				// start the post-exit activity
-				if (DroidUtil.isConnected(MainActivity.this)) {
-					startActivity(new Intent(MainActivity.this, PostExitActivity.class));
-				}
-			}
-		});
-		Runtime.getRuntime().addShutdownHook(shutdownThread);
-	}
-
 	private void setRightOverride(boolean val) {
 		rightOverride = val;
 		secondaryButton.setBackgroundDrawable(rightOverride? secondaryButtonColorBackground: secondaryButtonDefaultBackground);
 	}
 
-	public static List<File> runRenameLibs(File rulesFile, List<File> inFiles) {
-		System.out.println("Before rename: " + inFiles);
-		List<File> outFiles = new ArrayList<File>(inFiles.size());
-		for (File f: inFiles) {
-			String name = f.getName();
-			if (name.endsWith("_renamed.jar") || name.endsWith("_dexed.jar")) {
-				f.delete();
-				continue;
-			}
-			boolean doRename = false;
-			for (String s: libsToRename) {
-				if (name.contains(s)) {
-					// do the rename
-					doRename = true;
-					break;
-				}
-			}
-			if (doRename) {
-				String newPath = f.getAbsolutePath() + "_renamed.jar";
-				File newFile = new File(newPath);
-				MinecraftLaunch.runRename(rulesFile, f, newFile);
-				outFiles.add(newFile);
-			} else {
-				outFiles.add(f);
-			}
-		}
-		System.out.println("After rename: " + outFiles);
-		return outFiles;
-	}
-
-	public static void runDex(Context context, List<File> dexInFiles, File dexOut) {
-		System.out.println("Dexing " + dexInFiles);
-		dexOut.delete();
-		List<String> dexFragFiles = new ArrayList<String>();
-		for (File f: dexInFiles) {
-			if (f.getName().endsWith("_dexed.jar")) continue;
-			String newName = f.getAbsolutePath() + "_dexed.jar";
-			new File(newName).delete();
-			dexFragFiles.add(newName);
-			String[] dexArgs = {"--dex", "--no-optimize", "--num-threads=4", "--output=" + newName, f.getAbsolutePath()};
-			try {
-				runExt(context, "com.android.dx.command.Main", Arrays.asList(dexArgs));
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-		String[] dexArgs = {"--dex", "--no-optimize", "--num-threads=4", "--output=" + dexOut.getAbsolutePath()};
-		List<String> dexNewArgs = new ArrayList<String>();
-		dexNewArgs.addAll(Arrays.asList(dexArgs));
-		dexNewArgs.addAll(dexFragFiles);
-		try {
-			runExt(context, "com.android.dx.command.Main", dexNewArgs);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static void runTest(File dexFile, String testName) {
-		try {
-			File optDir = new File("/data/data/net.zhuoweizhang.boardwalk/files/dalvik-cache");
-			optDir.mkdirs();
-			DexClassLoader classLoader = new DexClassLoader(dexFile.getAbsolutePath(), 
-				optDir.getAbsolutePath(), "", MainActivity.class.getClassLoader());
-			Class<?> clazz = classLoader.loadClass("net.zhuoweizhang.boardwalk.testcase." + testName);
-			junit.framework.TestCase testCase = (junit.framework.TestCase) clazz.newInstance();
-			testCase.run();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}		
-	}
-
-	public static void runExt(Context context, String className, List<String> args) throws IOException, InterruptedException {
-		List<String> argsNew = new ArrayList<String>();
-		argsNew.add("dalvikvm");
-		argsNew.add("-Djava.library.path=" + System.getProperty("java.library.path"));
-		argsNew.add("-classpath");
-		argsNew.add(context.getPackageCodePath());
-		argsNew.add("-Xms384M");
-		argsNew.add("-Xmx768M");
-		argsNew.add(className);
-		argsNew.addAll(args);
-		Process p = new ProcessBuilder(argsNew).redirectErrorStream(true).start();
-		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		String line;
-		while((line = in.readLine()) != null) {
-			System.out.println(line);
-		}
-		p.waitFor();
-	}
-
-	public static void fixRSAPadding(File spongyFile, File optDir) throws Exception {
-		// welcome to the territory of YOLO; I'll be your tour guide for today.
-/*		System.out.println("Before: " + KeyFactory.getInstance("RSA") + ":" + KeyFactory.getInstance("RSA").getProvider());
-		DexClassLoader classLoader = new DexClassLoader(spongyFile.getAbsolutePath(),
-			optDir.getAbsolutePath(), null, MainActivity.class.getClassLoader());
-		Class<?> clazz = classLoader.loadClass("org.spongycastle.jce.provider.BouncyCastleProvider");
-		Security.insertProviderAt((Provider) clazz.newInstance(), 1);
-		System.out.println("After: " + KeyFactory.getInstance("RSA") + ":" + KeyFactory.getInstance("RSA").getProvider());*/
-		System.out.println(Cipher.getInstance("RSA"));
-		System.out.println(Cipher.getInstance("RSA/ECB/PKCS1Padding"));
-		Class<?> clazz = Class.forName("org.apache.harmony.security.fortress.Services");
-		try {
-			Method method = clazz.getMethod("getServices", String.class);
-			ArrayList<Provider.Service> rsaList = (ArrayList<Provider.Service>)
-				method.invoke(null, "Cipher.RSA");
-			ArrayList<Provider.Service> rsaPkcs1List = (ArrayList<Provider.Service>)
-				method.invoke(null, "Cipher.RSA/ECB/PKCS1PADDING");
-			rsaList.clear();
-			rsaList.addAll(rsaPkcs1List);
-		} catch (NoSuchMethodException nsme) { // 4.4.2 and below
-			Field servicesField = clazz.getDeclaredField("services");
-			servicesField.setAccessible(true);
-			Map<String, Provider.Service> services = (Map<String, Provider.Service>) servicesField.get(null);
-			services.put("Cipher.RSA", services.get("Cipher.RSA/ECB/PKCS1PADDING"));
-		}
-		//System.out.println("After: " + KeyFactory.getInstance("RSA") + ":" + KeyFactory.getInstance("RSA").getProvider());
-
-/*		Provider provider = KeyFactory.getInstance("RSA").getProvider();
-		System.out.println("Before: " + provider.getService("KeyService", "RSA"));
-		Provider.Service service = provider.getService("KeyService", "RSA/ECB/PKCS5Padding");
-		System.out.println(service);
-		provider.putService(service);
-		System.out.println("After: " + provider.getService("KeyService", "RSA"));*/
-	}
-
-	public static void runCraft(File dexFile) {
-		try {
-			File optDir = new File("/data/data/net.zhuoweizhang.boardwalk/files/dalvik-cache");
-			optDir.mkdirs();
-			DexClassLoader classLoader = new DexClassLoader(dexFile.getAbsolutePath(), 
-				optDir.getAbsolutePath(), "", MainActivity.class.getClassLoader());
-			fixRSAPadding(new File("/sdcard/boardwalk/spongy.jar"), optDir);
-			Class<?> clazz = classLoader.loadClass("net.minecraft.client.main.Main");
-			Method mainMethod = clazz.getMethod("main", String[].class);
-			File gameDir = new File("/sdcard/boardwalk/gamedir");
-			gameDir.mkdirs();
-			String[] myargs = {"--accessToken", "0", "--userProperties", "{}", "--version", "mcp",
-				"--gameDir", gameDir.getAbsolutePath()};
-			mainMethod.invoke(null, (Object) myargs);
-			//junit.framework.TestCase testCase = (junit.framework.TestCase) clazz.newInstance();
-			//testCase.run();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}		
-	}
-
+/*
 	public static void runCraft2(Context context, String versionName) {
 		try {
 			MinecraftVersion version = MinecraftDownloader.getVersionInfo(versionName);
@@ -638,52 +462,6 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		}
 	}
 
-	public static void forceUserHome(String s) throws Exception {
-		Properties props = System.getProperties();
-		Class clazz = props.getClass();
-		Field f = null;
-		while (clazz != null) {
-			try {
-				f = clazz.getDeclaredField("defaults");
-				break;
-			} catch (Exception e) {
-				clazz = clazz.getSuperclass();
-			}
-		}
-		if (f != null) {
-			f.setAccessible(true);
-			Properties defaultProps = (Properties) f.get(props);
-			defaultProps.put("user.home", s);
-		}
-	}
-
-	public static void initEnvs() {
-		try {
-			/*
-			Class<?> libcoreClass = Class.forName("libcore.io.Libcore");
-			Field osField = libcoreClass.getField("os");
-			Object os = osField.get(null);
-			Class osClass = os.getClass();
-			Method setEnvMethod = osClass.getMethod("setenv", String.class, String.class, Boolean.TYPE);
-			setEnvMethod.invoke(os, "LIBGL_MIPMAP", "3", true);
-			*/
-			DalvikTweaks.setenv("LIBGL_MIPMAP", "3", true);
-			System.setProperty("user.home", "/sdcard/boardwalk");
-			if (!System.getProperty("user.home", "/").equals("/sdcard/boardwalk")) {
-				forceUserHome("/sdcard/boardwalk");
-			}
-			System.setProperty("org.apache.logging.log4j.level", "INFO");
-			// this one is for the API's built in logger; we only use this one,
-			// but we set the one above also, just in case.
-			System.setProperty("org.apache.logging.log4j.simplelog.level", "INFO");
-			// JarJar renames these properties for us, so also set the renamed versions
-			System.setProperty("net.zhuoweizhang.boardwalk.org.apache.logging.log4j.level", "INFO");
-			System.setProperty("net.zhuoweizhang.boardwalk.org.apache.logging.log4j.simplelog.level", "INFO");
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	private static String[] buildMCArgs(Context context, String versionName) {
 		File gameDir = new File("/sdcard/boardwalk/gamedir");
 		gameDir.mkdirs();
@@ -703,6 +481,59 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		if (demo) retval.add("--demo");
 		return retval.toArray(new String[0]);
 	}
+*/
+
+	/* MasterPotato start */
+
+	public void launchPotato(View v) {
+		try {
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		startRenderer();
+	}
+
+	private void startRenderer() {
+		glSurfaceView.setVisibility(View.VISIBLE);
+		glSurfaceView.setRenderer(new GLSurfaceView.Renderer() {
+			public void onDrawFrame(GL10 gl) {
+			}
+			public void onSurfaceCreated(GL10 gl, javax.microedition.khronos.egl.EGLConfig config) {
+
+				while (true) {
+					try {
+						Thread.sleep(0x7fffffff);
+					} catch (Exception e) {}
+				}
+			}
+			public void onSurfaceChanged(GL10 gl, int width, int height) {
+			}
+		});
+		glSurfaceView.requestRender();
+	}
+
+
+
+	public void extractNewGlibc(View v) {
+		try {
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public class PotatoRunner implements Runnable {
+		public void run() {
+			try {
+				LoadMe.exec(null);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/* MasterPotato end */
 
 	private class PopupTextWatcher implements TextWatcher, TextView.OnEditorActionListener {
 		public void afterTextChanged(Editable e) {

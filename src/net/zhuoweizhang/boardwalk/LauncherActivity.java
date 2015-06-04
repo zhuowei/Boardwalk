@@ -17,6 +17,7 @@ import com.ipaulpro.afilechooser.utils.FileUtils;
 
 import com.google.android.gms.ads.*;
 
+import net.zhuoweizhang.boardwalk.potato.*;
 import net.zhuoweizhang.boardwalk.util.PlatformUtils;
 
 public class LauncherActivity extends Activity implements View.OnClickListener, LaunchMinecraftTask.Listener,
@@ -79,9 +80,6 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		handler.sendEmptyMessageDelayed(1337, 1000*30); // 30 seconds
 		initAds();
 		refreshToken();
-		if (new File("/sdcard/boardwalk/debugconsole").exists()) {
-			RemoteDebugConsole.start();
-		}
 	}
 
 	@Override
@@ -154,7 +152,15 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		versionSpinner.setVisibility(View.GONE);
 		importCredentialsButton.setVisibility(View.GONE);
 		importResourcePackButton.setVisibility(View.GONE);
-		new LaunchMinecraftTask(this, this).execute();
+		//new LaunchMinecraftTask(this, this).execute();
+		File runtimeDir = getDir("runtime", 0);
+		File versionFile = new File(runtimeDir, "version");
+		if (!versionFile.exists()) {
+			new ExtractRuntime(this).run();
+		} else {
+			new ExtractRuntime(this).extractExtras();
+		}
+		startActivity(new Intent(this, MainActivity.class));
 	}
 
 	public void onProgressUpdate(String s) {
@@ -173,9 +179,6 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		/*if (PlatformUtils.getTotalMemory() < (900000L * 1024L)) { // 900MB
 			builder.append(getResources().getText(R.string.recommendation_memory)).append("\n");
 		}*/
-		if (DalvikTweaks.isDalvik() && new File("/system/lib/libart.so").exists()) {
-			builder.append(getResources().getText(R.string.recommendation_art)).append("\n");
-		}
 		recommendationText.setText(builder.toString());
 	}
 

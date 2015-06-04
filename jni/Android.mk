@@ -6,6 +6,13 @@ LOCAL_SRC_FILES := main.c catcher.c
 
 include $(BUILD_SHARED_LIBRARY)
 
+include $(CLEAR_VARS)  
+LOCAL_LDLIBS := -llog -ldl -lEGL
+LOCAL_MODULE    := boardwalk_masterpotato
+LOCAL_SRC_FILES := elf_loader.c elf_loader_jni.c
+
+include $(BUILD_SHARED_LIBRARY)
+
 # stub twitchsdk
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
 
