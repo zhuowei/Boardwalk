@@ -204,6 +204,9 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				calculateMcScale();
 				System.out.println("WidthHeight: " + windowWidth + ":" + windowHeight);
 
+				LoadMe.setenv("POTATO_WINDOW_WIDTH", "" + windowWidth);
+				LoadMe.setenv("POTATO_WINDOW_HEIGHT", "" + windowHeight);
+
 				String selectedVersion = getSharedPreferences("launcher_prefs", 0).
 					getString("selected_version", VERSION_TO_LAUNCH);
 

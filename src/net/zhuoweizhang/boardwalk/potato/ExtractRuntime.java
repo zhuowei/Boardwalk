@@ -29,6 +29,7 @@ public class ExtractRuntime implements Runnable {
 			extractAsset("liblwjgl.so");
 			extractAsset("libGLESv1_CM.so");
 			extractAsset("libglshim.so");
+			extractAsset("libgcc_s.so.1");
 			versionFile.createNewFile();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -36,11 +37,12 @@ public class ExtractRuntime implements Runnable {
 	}
 
 	public void extractExtras() {
+		/*
 		try {
-			extractAsset("libgcc_s.so.1");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		*/
 	}
 
 	public void extractTar(String tar, String out) throws Exception {
