@@ -42,6 +42,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 
 	private AdView adView;
 	private InterstitialAd interstitial;
+	private static Thread extractThread;
 
 	public static final int REQUEST_BROWSE_FOR_CREDENTIALS = 1013; // date when this constant was added
 	public static final int REQUEST_BROWSE_FOR_RESOURCE_PACK = 1014;
@@ -80,6 +81,15 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		handler.sendEmptyMessageDelayed(1337, 1000*30); // 30 seconds
 		initAds();
 		refreshToken();
+
+		File runtimeDir = getDir("runtime", 0);
+		File versionFile = new File(runtimeDir, "version");
+		if (!versionFile.exists()) {
+			if (extractThread == null) {
+				extractThread = new Thread(new ExtractRuntime(this));
+				extractThread.start();
+			}
+		}
 	}
 
 	@Override
@@ -152,15 +162,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		versionSpinner.setVisibility(View.GONE);
 		importCredentialsButton.setVisibility(View.GONE);
 		importResourcePackButton.setVisibility(View.GONE);
-		//new LaunchMinecraftTask(this, this).execute();
-		File runtimeDir = getDir("runtime", 0);
-		File versionFile = new File(runtimeDir, "version");
-		if (!versionFile.exists()) {
-			new ExtractRuntime(this).run();
-		} else {
-			new ExtractRuntime(this).extractExtras();
-		}
-		startActivity(new Intent(this, MainActivity.class));
+		new LaunchMinecraftTask(this, this).execute();
 	}
 
 	public void onProgressUpdate(String s) {
@@ -292,14 +294,6 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			if (prefs.getString("selected_version", MainActivity.VERSION_TO_LAUNCH).equals(theVersion)) return;
 			prefs.edit().putString("selected_version", theVersion).apply();
 			System.out.println("Version: " + theVersion);
-			if (theVersion.equals("1.8") && DalvikTweaks.isDalvik()) {
-				new AlertDialog.Builder(this).setMessage("Minecraft 1.8 is unplayable on Dalvik due to severe lag" +
-					" and two-minute startup times. Please use a device with ART."+
-					" Launching 1.8 on Dalvik may work, but this is completely unsupported."+
-					" It is strongly recommended that you launch 1.7.10 instead.").
-					setPositiveButton(android.R.string.ok, null).
-					show();
-			}
 		}
 	}
 	public void onNothingSelected(AdapterView<?> parent) {
@@ -356,6 +350,17 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	private void refreshToken() {
 		if (!isLoggedIn()) return;
 		new RefreshAuthTokenTask(this).execute();
+	}
+
+	public void waitForExtras() {
+		// from Listener class.
+		if (extractThread != null) {
+			try {
+				extractThread.join();
+			} catch (InterruptedException lolnope) {
+				lolnope.printStackTrace();
+			}
+		}
 	}
 
 	private class LauncherAdListener extends AdListener {

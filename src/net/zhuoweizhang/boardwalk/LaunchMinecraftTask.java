@@ -14,7 +14,7 @@ import net.zhuoweizhang.boardwalk.util.*;
 
 public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 
-	public static final int MY_VERSION = 8;
+	public static final int MY_VERSION = 9;
 
 	private Context context;
 	private boolean forceDex;
@@ -32,7 +32,7 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 		// third, we take the version selected, download the version manifest, and use it to download libraries
 		// finally we use it to download Minecraft itself, and create a full dex.
 		// we return with the dex path to load, as well as the command line arguments to run MainActivity with.
-		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DEFAULT);
+		//android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DEFAULT);
 		try {
 			setupWorkingDir(context);
 			forceDex = getLauncherDirVersion() != MY_VERSION || new File("/sdcard/boardwalk/dexme").exists();
@@ -45,9 +45,9 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 				populateWorkingDir();
 				downloadLibraries(version);
 				downloadMinecraft(version);
-				dexOptMinecraft(version);
 			}
 			waitForAssetsDownload();
+			listener.waitForExtras();
 			extractDefaultOptions();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -58,7 +58,8 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 	}
 
 	public static void setupWorkingDir(Context context) {
-		File workingDir = context.getDir("working_dir", 0);
+		File workingDir = new File(Environment.getExternalStorageDirectory(), "boardwalk/gamedir");
+		workingDir.mkdirs();
 		MinecraftLaunch.init(workingDir);
 		MinecraftLaunch.javaVMCmd = Arrays.asList("dalvikvm", "-Djava.library.path=" + System.getProperty("java.library.path"),
 			"-classpath", context.getPackageCodePath());
@@ -76,12 +77,6 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 		publishProgress(context.getResources().getString(R.string.convert_populating_working_directory));
 		File dexLibDir = MinecraftLaunch.dexDir;
 		if (true) {
-			if (forceDex) IoUtil.clearDirectory(dexLibDir);
-			AssetsUtil.extractDirFromAssets(context, "dexed_libraries", dexLibDir);
-			AssetsUtil.extractFileFromAssets(context, "jarjarrules.txt", new File(MinecraftLaunch.launcherDir,
-				"jarjarrules.txt"));
-			AssetsUtil.extractFileFromAssets(context, "jarjarrules_minecraft.txt", new File(MinecraftLaunch.launcherDir,
-				"jarjarrules_minecraft.txt"));
 			writeLauncherDirVersion();
 		}
 	}
@@ -102,18 +97,6 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 				}
 			}
 		}
-		for (DependentLibrary library: version.libraries) {
-			String[] parts = library.name.split(":");
-			File localPath = LibrariesRepository.getLocalPath(parts[0], parts[1], parts[2]);
-			if (localPath == null) continue;
-			File localDexPath = LibrariesRepository.getDexLocalPath(parts[0], parts[1], parts[2]);
-			if (localDexPath != null) {
-				continue;
-			}
-			publishProgress(context.getResources().getString(R.string.convert_converting) + " " + library.name);
-			File outputPath = LibrariesRepository.getDexTargetPath(parts[0], parts[1], parts[2]);
-			MinecraftLaunch.runConvert(localPath, outputPath, /*MinecraftLaunch.libsToRename.contains(parts[1])*/true, null);
-		}
 	}
 
 	private void downloadMinecraft(MinecraftVersion version) throws Exception {
@@ -122,22 +105,10 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 			publishProgress(context.getResources().getString(R.string.convert_downloading) + " Minecraft " + version.id);
 			MinecraftDownloader.downloadMinecraftVersion(version);
 		}
-		if (forceDex || !MinecraftLaunch.canUseExistingDexPack(version)) {
-			publishProgress(context.getResources().getString(R.string.convert_converting) + " Minecraft " + version.id);
-			MinecraftLaunch.createDexPack(version);
-		}
-	}
-
-	private void dexOptMinecraft(MinecraftVersion version) {
-		publishProgress(context.getResources().getString(R.string.convert_preparing_to_launch_minecraft));
-		File optDir = context.getDir("dalvik-cache", 0);
-		optDir.mkdirs();
-		DexClassLoader classLoader = new DexClassLoader(MinecraftLaunch.getClassPath(version), 
-			optDir.getAbsolutePath(), "", this.getClass().getClassLoader());
 	}
 
 	private void extractDefaultOptions() throws IOException {
-		File boardwalkDir = new File("/sdcard/boardwalk");
+		File boardwalkDir = new File(Environment.getExternalStorageDirectory(), "boardwalk");
 		File gameDir = new File(boardwalkDir, "gamedir");
 		gameDir.mkdirs();
 		File optionsFile = new File(gameDir, "options.txt");
@@ -191,6 +162,7 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 	public static interface Listener {
 		public void onProgressUpdate(String s);
 		public void onLaunchError();
+		public void waitForExtras();
 	}
 
 }

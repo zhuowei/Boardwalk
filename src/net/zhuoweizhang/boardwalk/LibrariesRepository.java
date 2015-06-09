@@ -9,7 +9,7 @@ public class LibrariesRepository {
 
 	public static File[] localDirs, localDexDirs;
 	public static File downloadDir, dexOutputDir;
-	public static List<String> builtInLibs = Arrays.asList("gson", "jinput", "jutils", "lwjgl", "lwjgl_util");
+	public static List<String> builtInLibs = Arrays.asList("lwjgl", "lwjgl_util");
 
 	public static void setLocalLibPath(File[] locals, File downloadDir) {
 		localDirs = locals;
@@ -24,7 +24,6 @@ public class LibrariesRepository {
 	public static boolean needsDownload(String group, String artifact, String version) {
 		if (isBuiltInToLauncher(group, artifact, version)) return false;
 		if (getLocalPath(group, artifact, version) != null) return false;
-		if (getDexLocalPath(group, artifact, version) != null) return false;
 		if (isBlackListedLibrary(group, artifact, version)) return false;
 		return true;
 	}

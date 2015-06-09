@@ -215,7 +215,15 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				theEgl.eglMakeCurrent(theEgl.eglGetCurrentDisplay(), EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE,
 					EGL10.EGL_NO_CONTEXT);
 				LoadMe.runtimePath = runtimeDir.getAbsolutePath();
-				new Thread(new PotatoRunner()).start();
+				PotatoRunner runner = new PotatoRunner();
+				try {
+					MinecraftVersion version = MinecraftDownloader.getVersionInfo(selectedVersion);
+					runner.mcClassPath = MinecraftLaunch.getClassPath(version);
+					System.out.println(runner.mcClassPath);
+				} catch (IOException ie) {
+					throw new RuntimeException(ie);
+				}
+				new Thread(runner).start();
 
 				while (true) {
 					try {
@@ -527,9 +535,10 @@ public class MainActivity extends Activity implements View.OnTouchListener
 	}
 
 	public class PotatoRunner implements Runnable {
+		public String mcClassPath;
 		public void run() {
 			try {
-				LoadMe.exec(null);
+				LoadMe.exec(mcClassPath);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

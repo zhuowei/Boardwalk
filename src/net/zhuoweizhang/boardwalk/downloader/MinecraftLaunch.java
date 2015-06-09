@@ -45,10 +45,7 @@ public class MinecraftLaunch {
 
 	public static boolean canUseExistingDexPack(MinecraftVersion version) {
 		File versionFile = MinecraftDownloader.getMinecraftVersionFile(version);
-		File dexPack = getDexPackFile(version);
-		System.out.println("Dex pack: " + dexPack);
-		if (!dexPack.exists()) return false;
-		return !(versionFile.lastModified() > dexPack.lastModified()); //not newer
+		return versionFile.exists();
 	}
 
 	public static void createDexPack(MinecraftVersion version) throws Exception {
@@ -92,23 +89,23 @@ public class MinecraftLaunch {
 		return new File(dexPackDir, version.id + ".jar");
 	}
 
-	private static List<File> getDexedLibsForVersion(MinecraftVersion version) {
+	private static List<File> getLibsForVersion(MinecraftVersion version) {
 		List<File> retval = new ArrayList<File>();
 		for (DependentLibrary library: version.libraries) {
 			String[] parts = library.name.split(":");
-			File localDexPath = LibrariesRepository.getDexLocalPath(parts[0], parts[1], parts[2]);
-			if (localDexPath != null) retval.add(localDexPath);
+			File localPath = LibrariesRepository.getLocalPath(parts[0], parts[1], parts[2]);
+			if (localPath != null) retval.add(localPath);
 		}
 		return retval;
 	}
 
 	public static String getClassPath(MinecraftVersion version) {
 		StringBuilder builder = new StringBuilder();
-		builder.append(getDexPackFile(version).getAbsolutePath());
-		for (File f: getDexedLibsForVersion(version)) {
-			builder.append(":");
+		for (File f: getLibsForVersion(version)) {
 			builder.append(f.getAbsolutePath());
+			builder.append(":");
 		}
+		builder.append(MinecraftDownloader.getMinecraftVersionFile(version).getAbsolutePath());
 		return builder.toString();
 	}
 
