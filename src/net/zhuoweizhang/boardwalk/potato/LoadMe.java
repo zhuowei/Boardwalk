@@ -41,11 +41,7 @@ public class LoadMe {
 			String[] newargs = {runtimePath + "/newglibc/lib/ld-linux-armhf.so.3",
 				runtimePath + "/jvm/jdk1.8.0_33/jre/bin/java",
 				"-server", "-Xms450M", "-Xmx450M",
-				"-cp", "/sdcard/winprogress/potato/lwjgl/libs/lwjgl.jar:" +
-				"/sdcard/winprogress/potato/lwjgl/libs/lwjgl_test.jar:" +
-				"/sdcard/winprogress/potato/lwjgl/libs/lwjgl_util.jar:" +
-				"/sdcard/winprogress/potato/librarylwjglopenal-20100824.jar:" +
-				mcClassPath,
+				"-cp", mcClassPath,
 				"-Djava.library.path=" + runtimePath,
 				"net.minecraft.client.main.Main",
 				"--accessToken", "0", "--userProperties", "{}", "--version", "mcp",

@@ -126,7 +126,8 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 		assetsThread = new Thread(new Runnable() {
 			public void run() {
 				try {
-					MinecraftAssetsDownloader.downloadAssets(assetsVersion, new File("/sdcard/boardwalk/gamedir/assets"));
+					MinecraftAssetsDownloader.downloadAssets(assetsVersion,
+						new File(Environment.getExternalStorageDirectory(), "boardwalk/gamedir/assets"));
 				} catch (IOException ie) {
 					ie.printStackTrace();
 				}

@@ -218,7 +218,10 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				PotatoRunner runner = new PotatoRunner();
 				try {
 					MinecraftVersion version = MinecraftDownloader.getVersionInfo(selectedVersion);
-					runner.mcClassPath = MinecraftLaunch.getClassPath(version);
+					runner.mcClassPath = LoadMe.runtimePath + "/lwjgl.jar:" +
+						LoadMe.runtimePath + "/lwjgl_util.jar:" +
+						LoadMe.runtimePath + "/librarylwjglopenal-20100824.jar:" +
+						MinecraftLaunch.getClassPath(version);
 					System.out.println(runner.mcClassPath);
 				} catch (IOException ie) {
 					throw new RuntimeException(ie);
