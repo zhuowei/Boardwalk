@@ -23,8 +23,7 @@ public class LoadMe {
 	}
 
 	public static String ROOTFS_ARCH = "arm-linux-gnueabihf";
-	public static void exec(String mcClassPath) {
-		String ROOTFS_PATH = runtimePath + "/ubuntu";
+	public static void exec(String mcClassPath, String[] backArgs) {
 		try {
 			setenv("LD_LIBRARY_PATH", 
 				runtimePath + "/newglibc/lib:" +
@@ -38,25 +37,23 @@ public class LoadMe {
 
 			setupBridge();
 			byte[] auxv = readAuxV();
-			String[] newargs = {runtimePath + "/newglibc/lib/ld-linux-armhf.so.3",
+			String[] frontArgs = {runtimePath + "/newglibc/lib/ld-linux-armhf.so.3",
 				runtimePath + "/jvm/jdk1.8.0_33/jre/bin/java",
 				"-server", "-Xms450M", "-Xmx450M",
 				"-cp", mcClassPath,
-				"-Djava.library.path=" + runtimePath,
-				"net.minecraft.client.main.Main",
-				"--accessToken", "0", "--userProperties", "{}", "--version", "mcp",
-				"--gameDir", "/sdcard/boardwalk/gamedir"};
+				"-Djava.library.path=" + runtimePath};
+			String[] fullArgs = new String[frontArgs.length + backArgs.length];
+			System.arraycopy(frontArgs, 0, fullArgs, 0, frontArgs.length);
+			System.arraycopy(backArgs, 0, fullArgs, frontArgs.length, backArgs.length);
 			System.out.println("Preparing to exec");
 			redirectStdio();
 			chdir("/sdcard/boardwalk/gamedir");
-			potatoExec(auxv, newargs);
+			potatoExec(auxv, fullArgs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	public static void main(String[] args) {
-		exec(null);
-	}
+
 	static {
 		System.loadLibrary("boardwalk_masterpotato");
 	}

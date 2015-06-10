@@ -51,5 +51,5 @@ Note that the import process will log you out on the desktop launcher.</string>
 A special thanks to ptitSeb and lunixbochs for writing glShim, which made this application possible.\n
 This application is not affiliated with Mojang AB. Minecraft ®/TM © 2009-2013 Mojang / Notch.
     </string>
-    <string name="about_copyright">Copyright (c) 2014 Zhuowei Zhang</string>
+    <string name="about_copyright">Copyright (c) 2015 Zhuowei Zhang</string>
 </resources>

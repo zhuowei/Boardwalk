@@ -84,7 +84,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 
 		File runtimeDir = getDir("runtime", 0);
 		File versionFile = new File(runtimeDir, "version");
-		if (!versionFile.exists()) {
+		if (!versionFile.exists() || new File("/sdcard/boardwalk/extract").exists()) {
 			if (extractThread == null) {
 				extractThread = new Thread(new ExtractRuntime(this));
 				extractThread.start();

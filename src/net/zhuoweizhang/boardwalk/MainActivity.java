@@ -16,6 +16,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
@@ -30,15 +31,12 @@ import android.widget.*;
 
 import dalvik.system.*;
 
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.AndroidContextImplementation;
-import org.lwjgl.opengl.AndroidDisplay;
-import org.lwjgl.opengl.AndroidKeyCodes;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLContext;
 
 import net.zhuoweizhang.boardwalk.downloader.*;
+import net.zhuoweizhang.boardwalk.lwjgl.*;
 import net.zhuoweizhang.boardwalk.model.*;
 import net.zhuoweizhang.boardwalk.potato.*;
 import net.zhuoweizhang.boardwalk.util.*;
@@ -222,7 +220,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 						LoadMe.runtimePath + "/lwjgl_util.jar:" +
 						LoadMe.runtimePath + "/librarylwjglopenal-20100824.jar:" +
 						MinecraftLaunch.getClassPath(version);
-					System.out.println(runner.mcClassPath);
+					runner.mcArgs = buildMCArgs(MainActivity.this, selectedVersion);
 				} catch (IOException ie) {
 					throw new RuntimeException(ie);
 				}
@@ -476,8 +474,10 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		}
 	}
 
+*/
+
 	private static String[] buildMCArgs(Context context, String versionName) {
-		File gameDir = new File("/sdcard/boardwalk/gamedir");
+		File gameDir = new File(Environment.getExternalStorageDirectory(), "boardwalk/gamedir");
 		gameDir.mkdirs();
 		File assetsDir = new File(gameDir, "assets");
 		assetsDir.mkdirs();
@@ -488,6 +488,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		String username = prefs.getString("auth_profile_name", "Player");
 		String userType = demo? "legacy" : "mojang"; // Only demo uses non-Yggdrasil auth, it seems
 		List<String> retval = new ArrayList(Arrays.asList(
+			"net.minecraft.client.main.Main",
 			"--username", username, "--version", versionName, "--gameDir", gameDir.getAbsolutePath(),
 			"--assetsDir", assetsDir.getAbsolutePath(), "--assetIndex", versionName, "--uuid", userUUID,
 			"--accessToken", accessToken, "--userProperties", "{}", "--userType", userType
@@ -495,53 +496,15 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		if (demo) retval.add("--demo");
 		return retval.toArray(new String[0]);
 	}
-*/
 
 	/* MasterPotato start */
 
-	public void launchPotato(View v) {
-		try {
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		startRenderer();
-	}
-
-	private void startRenderer() {
-		glSurfaceView.setVisibility(View.VISIBLE);
-		glSurfaceView.setRenderer(new GLSurfaceView.Renderer() {
-			public void onDrawFrame(GL10 gl) {
-			}
-			public void onSurfaceCreated(GL10 gl, javax.microedition.khronos.egl.EGLConfig config) {
-
-				while (true) {
-					try {
-						Thread.sleep(0x7fffffff);
-					} catch (Exception e) {}
-				}
-			}
-			public void onSurfaceChanged(GL10 gl, int width, int height) {
-			}
-		});
-		glSurfaceView.requestRender();
-	}
-
-
-
-	public void extractNewGlibc(View v) {
-		try {
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	public class PotatoRunner implements Runnable {
 		public String mcClassPath;
+		public String[] mcArgs;
 		public void run() {
 			try {
-				LoadMe.exec(mcClassPath);
+				LoadMe.exec(mcClassPath, mcArgs);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
