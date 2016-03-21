@@ -156,7 +156,8 @@ public class LaunchMinecraftTask extends AsyncTask<Void, String, String> {
 				" Android " + Build.VERSION.RELEASE + "\nError: " + result);
 			listener.onLaunchError();
 		} else {
-			context.startActivity(new Intent(context, MainActivity.class));
+			PostExitActivity.doLaunch = true;
+			context.startActivity(new Intent(context, PostExitActivity.class));
 		}
 	}
 

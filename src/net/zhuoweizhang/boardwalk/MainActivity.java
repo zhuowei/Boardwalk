@@ -43,7 +43,7 @@ import net.zhuoweizhang.boardwalk.util.*;
 
 public class MainActivity extends Activity implements View.OnTouchListener
 {
-	public static final String VERSION_TO_LAUNCH = "1.7.10";
+	public static final String VERSION_TO_LAUNCH = "1.8.7";
 	public static final String initText = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
 					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ";
 
@@ -216,11 +216,12 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				PotatoRunner runner = new PotatoRunner();
 				try {
 					MinecraftVersion version = MinecraftDownloader.getVersionInfo(selectedVersion);
-					runner.mcClassPath = LoadMe.runtimePath + "/lwjgl.jar:" +
+					runner.mcClassPath = LoadMe.runtimePath + "/clientname.jar:" +
+						LoadMe.runtimePath + "/lwjgl.jar:" +
 						LoadMe.runtimePath + "/lwjgl_util.jar:" +
 						LoadMe.runtimePath + "/librarylwjglopenal-20100824.jar:" +
 						MinecraftLaunch.getClassPath(version);
-					runner.mcArgs = buildMCArgs(MainActivity.this, selectedVersion);
+					runner.mcArgs = buildMCArgs(MainActivity.this, selectedVersion, version);
 				} catch (IOException ie) {
 					throw new RuntimeException(ie);
 				}
@@ -476,7 +477,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 
 */
 
-	private static String[] buildMCArgs(Context context, String versionName) {
+	private static String[] buildMCArgs(Context context, String versionName, MinecraftVersion version) {
 		File gameDir = new File(Environment.getExternalStorageDirectory(), "boardwalk/gamedir");
 		gameDir.mkdirs();
 		File assetsDir = new File(gameDir, "assets");
@@ -487,12 +488,27 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		boolean demo = userUUID.equals("00000000-0000-0000-0000-000000000000");
 		String username = prefs.getString("auth_profile_name", "Player");
 		String userType = demo? "legacy" : "mojang"; // Only demo uses non-Yggdrasil auth, it seems
-		List<String> retval = new ArrayList(Arrays.asList(
-			"net.minecraft.client.main.Main",
-			"--username", username, "--version", versionName, "--gameDir", gameDir.getAbsolutePath(),
-			"--assetsDir", assetsDir.getAbsolutePath(), "--assetIndex", versionName, "--uuid", userUUID,
-			"--accessToken", accessToken, "--userProperties", "{}", "--userType", userType
-			));
+
+		Map<String, String> subs = new HashMap<String, String>();
+		subs.put("${auth_player_name}", username);
+		subs.put("${version_name}", versionName);
+		subs.put("${game_directory}", gameDir.getAbsolutePath());
+		subs.put("${assets_root}", assetsDir.getAbsolutePath());
+		subs.put("${assets_index_name}", version.assets);
+		subs.put("${auth_uuid}", userUUID);
+		subs.put("${auth_access_token}", accessToken);
+		subs.put("${user_properties}", "{}");
+		subs.put("${user_type}", userType);
+
+		String[] mcArgs = version.minecraftArguments.split(" ");
+		for (int i = 0; i < mcArgs.length; i++) {
+			String sub = subs.get(mcArgs[i]);
+			if (sub != null) mcArgs[i] = sub;
+		}
+
+		List<String> retval = new ArrayList(1 + mcArgs.length + (demo? 1: 0));
+		retval.add(version.mainClass);
+		retval.addAll(Arrays.asList(mcArgs));
 		if (demo) retval.add("--demo");
 		return retval.toArray(new String[0]);
 	}

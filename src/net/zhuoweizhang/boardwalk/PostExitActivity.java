@@ -17,9 +17,24 @@ public class PostExitActivity extends Activity {
 
 	private InterstitialAd interstitial;
 	private ProgressBar progressBar;
+	public static boolean doLaunch = false;
 
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+		// this is probably a serious abuse of the Android activity lifecycle, but:
+		// LauncherActivity sets doLaunch to true when launching PostExitActivity
+		// in this mode we chain to MainActivity
+		// when MainActivity dies, doLaunch is no longer true in the new JVM created after death
+		// so we show an ad instead
+		if (doLaunch) {
+			launch();
+			doLaunch = false;
+		} else {
+			loadAd();
+		}
+	}
+
+	private void loadAd() {
 		progressBar = new ProgressBar(this);
 		progressBar.setIndeterminate(true);
 		setContentView(progressBar, new ViewGroup.LayoutParams(
@@ -34,7 +49,10 @@ public class PostExitActivity extends Activity {
 			.build();
 		interstitial.setAdListener(new PostExitAdListener());
 		interstitial.loadAd(adRequest);
+	}
 
+	private void launch() {
+		startActivityForResult(new Intent(this, MainActivity.class), 1234);
 	}
 
 	private class PostExitAdListener extends AdListener {

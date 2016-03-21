@@ -6,4 +6,6 @@ public class MinecraftVersion extends MinecraftVersionList.Version {
 	public String mainClass;
 	public int minimumLauncherVersion;
 	public String assets;
+	public String inheritsFrom;
+	public String jar;
 }

@@ -23,7 +23,7 @@ import net.zhuoweizhang.boardwalk.util.PlatformUtils;
 public class LauncherActivity extends Activity implements View.OnClickListener, LaunchMinecraftTask.Listener,
 	AdapterView.OnItemSelectedListener {
 
-	public static final String[] versionsSupported = {"1.7.10", "1.8"};
+	public static final String[] versionsSupported = {"1.7.10", "1.8.7"};
 
 	public TextView usernameText, passwordText;
 	public Button loginButton;
@@ -190,6 +190,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
 			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER)
 			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER_L)
+			.addTestDevice("D8F3383EC7C7875FADC84B5CA9C48CA4")
 			.build();
 		adView.loadAd(adRequest);
 		interstitial = new InterstitialAd(this);
@@ -198,6 +199,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
 			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER)
 			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER_L)
+			.addTestDevice("D8F3383EC7C7875FADC84B5CA9C48CA4")
 			.build();
 		interstitial.setAdListener(new LauncherAdListener());
 		interstitial.loadAd(adRequest2);
@@ -318,8 +320,18 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		startActivityForResult(target, REQUEST_BROWSE_FOR_RESOURCE_PACK);
 	}
 
+	private String[] listVersionsInstalled() {
+		File versionsDir = new File(Environment.getExternalStorageDirectory(), "boardwalk/gamedir/versions");
+		String[] retval = versionsDir.list();
+		if (retval == null) retval = new String[0];
+		return retval;
+	}
+
 	private void updateVersionSpinner() {
 		versionsStringList.addAll(Arrays.asList(versionsSupported));
+		for (String s: listVersionsInstalled()) {
+			if (!versionsStringList.contains(s)) versionsStringList.add(s);
+		}
 		String selectedVersion = getSharedPreferences("launcher_prefs", 0).
 			getString("selected_version", MainActivity.VERSION_TO_LAUNCH);
 		if (!versionsStringList.contains(selectedVersion)) versionsStringList.add(selectedVersion);
@@ -336,6 +348,9 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			getString("selected_version", MainActivity.VERSION_TO_LAUNCH);
 		versionsStringList.clear();
 		versionsStringList.addAll(newVersions);
+		for (String s: listVersionsInstalled()) {
+			if (!versionsStringList.contains(s)) versionsStringList.add(s);
+		}
 
 		int selectedVersionIndex = versionsStringList.indexOf(selectedVersion);
 		System.out.println("Selected version: " + selectedVersion + " index: " + selectedVersionIndex);
