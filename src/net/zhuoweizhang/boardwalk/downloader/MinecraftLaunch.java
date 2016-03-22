@@ -39,7 +39,7 @@ public class MinecraftLaunch {
 			return;
 		}
 		javaVMCmd = Arrays.asList("java", "-server", "-classpath", System.getProperty("java.class.path"));
-		MinecraftDownloader.useMavenCentral = true;
+		//MinecraftDownloader.useMavenCentral = true;
 		doPreDex(args[1], Arrays.asList("gson", "jinput", "jutils", "lwjgl", "lwjgl_util", "authlib", "realms"));
 	}
 

@@ -31,6 +31,7 @@ public class PostExitActivity extends Activity {
 			.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
 			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER)
 			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER_L)
+			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER_NEW)
 			.build();
 		interstitial.setAdListener(new PostExitAdListener());
 		interstitial.loadAd(adRequest);

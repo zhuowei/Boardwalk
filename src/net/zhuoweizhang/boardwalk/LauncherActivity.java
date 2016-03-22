@@ -22,7 +22,7 @@ import net.zhuoweizhang.boardwalk.util.PlatformUtils;
 public class LauncherActivity extends Activity implements View.OnClickListener, LaunchMinecraftTask.Listener,
 	AdapterView.OnItemSelectedListener {
 
-	public static final String[] versionsSupported = {"1.7.10", "1.8"};
+	public static final String[] versionsSupported = {"1.9"};
 
 	public TextView usernameText, passwordText;
 	public Button loginButton;
@@ -185,6 +185,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
 			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER)
 			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER_L)
+			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER_NEW)
 			.build();
 		adView.loadAd(adRequest);
 		interstitial = new InterstitialAd(this);
@@ -193,6 +194,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
 			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER)
 			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER_L)
+			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER_NEW)
 			.build();
 		interstitial.setAdListener(new LauncherAdListener());
 		interstitial.loadAd(adRequest2);

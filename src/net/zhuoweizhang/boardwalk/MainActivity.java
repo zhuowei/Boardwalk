@@ -44,7 +44,7 @@ import net.zhuoweizhang.boardwalk.util.*;
 
 public class MainActivity extends Activity implements View.OnTouchListener
 {
-	public static final String VERSION_TO_LAUNCH = "1.7.10";
+	public static final String VERSION_TO_LAUNCH = "1.9";
 	public static final String initText = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
 					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ";
 
@@ -565,6 +565,9 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		System.out.println("After: " + KeyFactory.getInstance("RSA") + ":" + KeyFactory.getInstance("RSA").getProvider());*/
 		System.out.println(Cipher.getInstance("RSA"));
 		System.out.println(Cipher.getInstance("RSA/ECB/PKCS1Padding"));
+		if (android.os.Build.VERSION.SDK_INT >= 23) { // Marshmallow
+			return; // FUUUUU I DON'T KNOW FIXME
+		}
 		Class<?> clazz = Class.forName("org.apache.harmony.security.fortress.Services");
 		try {
 			Method method = clazz.getMethod("getServices", String.class);
