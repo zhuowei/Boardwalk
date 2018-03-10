@@ -9,10 +9,11 @@ public class ExtractRuntime implements Runnable {
 	private Context context;
 	private File runtimeDir;
 	private File tempDir;
+	public static final String VERSION_FLAG_NAME = "version1";
 	public ExtractRuntime(Context context) {
 		this.context = context;
 		this.runtimeDir = context.getDir("runtime", 0);
-		this.tempDir = new File(Environment.getExternalStorageDirectory(), "boardwalk/gamedir/tmp");
+		this.tempDir = new File("/data/data/net.zhuoweizhang.boardwalk/app_runtime/extract_tmp");//new File(Environment.getExternalStorageDirectory(), "boardwalk/gamedir/tmp");
 	}
 
 	private void extractAsset(String name) throws IOException {
@@ -23,7 +24,7 @@ public class ExtractRuntime implements Runnable {
 
 	public void run() {
 		try {
-			File versionFile = new File(runtimeDir, "version");
+			File versionFile = new File(runtimeDir, VERSION_FLAG_NAME);
 			versionFile.delete();
 			extractAsset("busybox");
 			extractTar("jre.tar.xz", new File(runtimeDir, "jvm").getAbsolutePath());
@@ -61,7 +62,7 @@ public class ExtractRuntime implements Runnable {
 		String[] argsNew = new String[]{new File(runtimeDir, "busybox").getAbsolutePath(), "tar", "xJf",
 			tempOut.getAbsolutePath(), "-C", out};
 		doExec(argsNew);
-		tempOut.delete();
+		//tempOut.delete();
 	}
 
 	public static void doExec(String[] argsNew) throws Exception {

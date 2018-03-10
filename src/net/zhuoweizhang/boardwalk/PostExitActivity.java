@@ -42,10 +42,7 @@ public class PostExitActivity extends Activity {
 
 		interstitial = new InterstitialAd(this);
 		interstitial.setAdUnitId("ca-app-pub-2652482030334356/5468611825");
-		AdRequest adRequest = new AdRequest.Builder()
-			.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER)
-			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER_L)
+		AdRequest adRequest = AdUtils.addTestDevices(new AdRequest.Builder())
 			.build();
 		interstitial.setAdListener(new PostExitAdListener());
 		interstitial.loadAd(adRequest);

@@ -223,7 +223,24 @@ static void SetupBrk() {
     ElfLoader_die("Sbrk failed");
   }
 }
-
+extern void hack();
+void dump_entry(int argc, char** argv, char** environ) {
+    __android_log_print(ANDROID_LOG_ERROR, "Boardwalk", "argc: %d", argc);
+for (int i = 0; i < argc; i++) {
+    __android_log_print(ANDROID_LOG_ERROR, "Boardwalk", "argv: %d=%s", i, argv[i]);
+}
+int envcount = 0;
+for (int i = 0; environ[i]; i++) {
+    __android_log_print(ANDROID_LOG_ERROR, "Boardwalk", "environ: %d=%s", i, environ[i]);
+envcount++;
+}
+ElfW(auxv_t)* auxv = (ElfW(auxv_t)*) (environ + envcount + 1);
+for (int i = 0; ; i++) {
+    __android_log_print(ANDROID_LOG_ERROR, "Boardwalk", "auxv: %d=%x", auxv[i].a_type, auxv[i].a_un.a_val);
+	if (auxv[i].a_type == AT_NULL) break;
+}
+abort();
+}
 int PotatoExec(void* src_auxv, size_t src_auxv_size,
 	int argc, char **argv) {
   printf("PotatoExec: %d %s\n", argc, argv[0]);
@@ -257,6 +274,7 @@ int PotatoExec(void* src_auxv, size_t src_auxv_size,
   size_t stackSize = 8*1024*1024; // 8 MB
   size_t stackAlloc = PageSizeRoundUp(infoblock_entries * sizeof(void*)) +
 	stackSize;
+  __android_log_print(ANDROID_LOG_ERROR, "Boardwalk", "infoblock_entries %d stackAlloc %x\n", infoblock_entries, stackAlloc);
   char** stack = mmap(NULL, stackAlloc, PROT_READ|PROT_WRITE, MAP_GROWSDOWN|MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
   //printf("New stack: %p old environ: %p\n", stack, environ);
 
@@ -273,11 +291,14 @@ int PotatoExec(void* src_auxv, size_t src_auxv_size,
   /*
   SetAuxvField(auxv, AT_SYSINFO, (uintptr_t) syscallEntryPointNoFrame);
   */
+  /* Android Oreo's Zygote is setuid. Clear AT_SECURE. */
+  SetAuxvField(auxv, AT_SECURE, 0);
 
   void *entry_point = LoadElfObject(executable_fd, auxv);
   //__android_log_print(ANDROID_LOG_ERROR, "MasterPotato", "Entry point: %p auxv %p\n", entry_point, auxv);
 
   //SetupBrk(); // and hope the original app's done expanding its heap
-
+//entry_point = &hack;
+  __android_log_print(ANDROID_LOG_ERROR, "MasterPotato", "Entry %p hack %p dump_entry %p\n", entry_point, &hack, &dump_entry);
   JumpToElfEntryPoint(stack, entry_point, 0);
 }

@@ -9,6 +9,10 @@
 #include <EGL/egl.h>
 #include <stdbool.h>
 
+#include <signal.h>
+#include <sys/syscall.h>
+#include <asm/siginfo.h>
+
 int PotatoExec(void* src_auxv, size_t src_auxv_size,
 	int argc, char **argv);
 
@@ -44,7 +48,7 @@ JNIEXPORT void JNICALL Java_net_zhuoweizhang_boardwalk_potato_LoadMe_setenv
 
 JNIEXPORT void JNICALL Java_net_zhuoweizhang_boardwalk_potato_LoadMe_redirectStdio
   (JNIEnv *env, jclass clazz) {
-	int outputfd = open("/sdcard/potato_output.txt", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	int outputfd = open("/sdcard/boardwalk/log_output.txt", O_WRONLY | O_CREAT | O_TRUNC, 0666);
 	dup2(outputfd, 1);
 	dup2(outputfd, 2);
 }
@@ -76,4 +80,35 @@ JNIEXPORT jint JNICALL Java_net_zhuoweizhang_boardwalk_potato_LoadMe_chdir
 	int retval = chdir(name);
 	(*env)->ReleaseStringUTFChars(env, nameStr, name);
 	return retval;
+}
+
+// sigsys handler
+static struct sigaction sigsys_oldaction;
+static void sigsys_handler(int signal, siginfo_t* si, void* extra) {
+	ucontext_t* ctx = extra;
+	if (si->si_signo == SIGSYS && si->si_code == SYS_SECCOMP) {
+		switch (si->si_syscall) {
+			case __NR_set_robust_list:
+			case __NR_send: // FIXME
+			case __NR_recv:
+			{
+				ctx->uc_mcontext.arm_r0 = -ENOSYS;
+				return;
+			}
+			default:
+				break;
+		}
+	}
+	// chain
+	sigsys_oldaction.sa_sigaction(signal, si, extra);
+}
+
+JNIEXPORT jint JNICALL Java_net_zhuoweizhang_boardwalk_potato_LoadMe_setupSigSys
+  (JNIEnv *env, jclass clazz) {
+	struct sigaction newaction;
+	memset(&newaction, 0, sizeof(newaction));
+	newaction.sa_sigaction = &sigsys_handler;
+	newaction.sa_flags = SA_SIGINFO;
+	int ret = sigaction(SIGSYS, &newaction, &sigsys_oldaction);
+	return ret;
 }

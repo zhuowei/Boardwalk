@@ -9,7 +9,7 @@ include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)  
 LOCAL_LDLIBS := -llog -ldl -lEGL
 LOCAL_MODULE    := boardwalk_masterpotato
-LOCAL_SRC_FILES := elf_loader.c elf_loader_jni.c
+LOCAL_SRC_FILES := elf_loader.c elf_loader_jni.c hack.s
 
 include $(BUILD_SHARED_LIBRARY)
 

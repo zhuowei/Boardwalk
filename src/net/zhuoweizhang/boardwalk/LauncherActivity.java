@@ -83,7 +83,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		refreshToken();
 
 		File runtimeDir = getDir("runtime", 0);
-		File versionFile = new File(runtimeDir, "version");
+		File versionFile = new File(runtimeDir, ExtractRuntime.VERSION_FLAG_NAME);
 		if (!versionFile.exists() || new File("/sdcard/boardwalk/extract").exists()) {
 			if (extractThread == null) {
 				extractThread = new Thread(new ExtractRuntime(this));
@@ -186,20 +186,12 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 
 	private void initAds() {
 		adView = (AdView) findViewById(R.id.ad);
-		AdRequest adRequest = new AdRequest.Builder()
-			.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER)
-			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER_L)
-			.addTestDevice("D8F3383EC7C7875FADC84B5CA9C48CA4")
+		AdRequest adRequest = AdUtils.addTestDevices(new AdRequest.Builder())
 			.build();
 		adView.loadAd(adRequest);
 		interstitial = new InterstitialAd(this);
 		interstitial.setAdUnitId("ca-app-pub-2652482030334356/4318313426");
-		AdRequest adRequest2 = new AdRequest.Builder()
-			.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER)
-			.addTestDevice(AdvertConstants.DEVICE_ID_TESTER_L)
-			.addTestDevice("D8F3383EC7C7875FADC84B5CA9C48CA4")
+		AdRequest adRequest2 = AdUtils.addTestDevices(new AdRequest.Builder())
 			.build();
 		interstitial.setAdListener(new LauncherAdListener());
 		interstitial.loadAd(adRequest2);
