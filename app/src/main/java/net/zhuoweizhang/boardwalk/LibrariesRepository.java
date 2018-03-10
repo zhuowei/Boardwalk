@@ -9,7 +9,8 @@ public class LibrariesRepository {
 
 	public static File[] localDirs, localDexDirs;
 	public static File downloadDir, dexOutputDir;
-	public static List<String> builtInLibs = Arrays.asList("lwjgl", "lwjgl_util");
+	public static List<String> builtInLibs = Arrays.asList("lwjgl", "lwjgl_util",
+		"lwjgl-openal", "lwjgl-opengl", "lwjgl-jemalloc", "lwjgl-glfw", "lwjgl-stb");
 
 	public static void setLocalLibPath(File[] locals, File downloadDir) {
 		localDirs = locals;

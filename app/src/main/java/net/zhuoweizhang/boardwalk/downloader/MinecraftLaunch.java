@@ -99,8 +99,28 @@ public class MinecraftLaunch {
 		return retval;
 	}
 
-	public static String getClassPath(MinecraftVersion version) {
+	private static boolean isUsingLWJGL3(MinecraftVersion version) {
+		for (DependentLibrary library: version.libraries) {
+			String[] parts = library.name.split(":");
+			if (parts[1].equals("lwjgl")) {
+				boolean isOldLWJGL = parts[2].charAt(0) == '2';
+				return !isOldLWJGL;
+			}
+		}
+		return false;
+	}
+
+	private static String getLWJGLClassPath(MinecraftVersion version, String runtimePath) {
+		if (isUsingLWJGL3(version)) {
+			return runtimePath + "/lwjgl3/*:";
+		}
+		return runtimePath + "/lwjgl.jar:" + runtimePath + "/lwjgl_util.jar:" +
+			runtimePath + "/librarylwjglopenal-20100824.jar:";
+	}
+
+	public static String getClassPath(MinecraftVersion version, String runtimePath) {
 		StringBuilder builder = new StringBuilder();
+		builder.append(getLWJGLClassPath(version, runtimePath));
 		for (File f: getLibsForVersion(version)) {
 			builder.append(f.getAbsolutePath());
 			builder.append(":");

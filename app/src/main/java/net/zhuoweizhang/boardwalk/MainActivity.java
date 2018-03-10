@@ -217,10 +217,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				try {
 					MinecraftVersion version = MinecraftDownloader.getVersionInfo(selectedVersion);
 					runner.mcClassPath = LoadMe.runtimePath + "/clientname.jar:" +
-						LoadMe.runtimePath + "/lwjgl.jar:" +
-						LoadMe.runtimePath + "/lwjgl_util.jar:" +
-						LoadMe.runtimePath + "/librarylwjglopenal-20100824.jar:" +
-						MinecraftLaunch.getClassPath(version);
+						MinecraftLaunch.getClassPath(version, LoadMe.runtimePath);
 					runner.mcArgs = buildMCArgs(MainActivity.this, selectedVersion, version);
 				} catch (IOException ie) {
 					throw new RuntimeException(ie);
