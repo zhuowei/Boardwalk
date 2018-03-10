@@ -185,14 +185,7 @@ public class MinecraftLaunch {
 	}
 
 	public static void runRename(File rulesFile, File jarjarIn, File jarjarOut) {
-		System.out.println("Renaming: " + jarjarIn + " to " + jarjarOut);
-		jarjarOut.delete();
-		String[] jarjarArgs = {"process", rulesFile.getAbsolutePath(), jarjarIn.getAbsolutePath(), jarjarOut.getAbsolutePath()};
-		try {
-			com.tonicsystems.jarjar.Main.main(jarjarArgs);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		throw new RuntimeException("JarJar removed");
 	}
 
 	public static void runDex(List<File> dexInFiles, File dexOut) {

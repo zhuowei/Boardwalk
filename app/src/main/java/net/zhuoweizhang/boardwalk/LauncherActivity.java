@@ -12,8 +12,10 @@ import android.os.*;
 import android.view.*;
 import android.widget.*;
 
+/*
 import com.ipaulpro.afilechooser.FileChooserActivity;
 import com.ipaulpro.afilechooser.utils.FileUtils;
+*/
 
 import com.google.android.gms.ads.*;
 
@@ -244,6 +246,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	}
 
 	public void doBrowseForCredentials() {
+/*
 		new AlertDialog.Builder(this).setMessage(R.string.login_import_credentials_info).
 			setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialogI, int button) {
@@ -256,11 +259,13 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			}).
 			setNegativeButton(android.R.string.cancel, null).
 			show();
+*/
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
+/*
 			case REQUEST_BROWSE_FOR_CREDENTIALS:
 				if (resultCode == RESULT_OK) {  
 					final Uri uri = data.getData();
@@ -275,6 +280,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 					new ImportResourcePackTask(this).execute(file);
 				}
 				break;
+*/
 			default:
 				super.onActivityResult(requestCode, resultCode, data);
 				break;
@@ -305,11 +311,13 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	}
 
 	private void doBrowseForResourcePack() {
+/*
 		Intent target = FileUtils.createGetContentIntent();
 		target.setType("application/zip");
 		target.setClass(LauncherActivity.this, FileChooserActivity.class);
 
 		startActivityForResult(target, REQUEST_BROWSE_FOR_RESOURCE_PACK);
+*/
 	}
 
 	private String[] listVersionsInstalled() {
