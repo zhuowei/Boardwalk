@@ -9,11 +9,11 @@ public class ExtractRuntime implements Runnable {
 	private Context context;
 	private File runtimeDir;
 	private File tempDir;
-	public static final String VERSION_FLAG_NAME = "version1";
+	public static final String VERSION_FLAG_NAME = "version2";
 	public ExtractRuntime(Context context) {
 		this.context = context;
 		this.runtimeDir = context.getDir("runtime", 0);
-		this.tempDir = new File("/data/data/net.zhuoweizhang.boardwalk/app_runtime/extract_tmp");//new File(Environment.getExternalStorageDirectory(), "boardwalk/gamedir/tmp");
+		this.tempDir = new File(runtimeDir, "extract_tmp");
 	}
 
 	private void extractAsset(String name) throws IOException {
@@ -28,7 +28,7 @@ public class ExtractRuntime implements Runnable {
 			versionFile.delete();
 			extractAsset("busybox");
 			extractTar("jre.tar.xz", new File(runtimeDir, "jvm").getAbsolutePath());
-			extractTar("newglibc.tar.xz", new File(runtimeDir, "newglibc").getAbsolutePath());
+/* FIXME!
 			extractAsset("libboardwalk_preload.so");
 			extractAsset("liblwjgl.so");
 			extractAsset("libGLESv1_CM.so");
@@ -37,6 +37,7 @@ public class ExtractRuntime implements Runnable {
 			extractAsset("lwjgl.jar");
 			extractAsset("lwjgl_util.jar");
 			extractAsset("librarylwjglopenal-20100824.jar");
+*/
 			versionFile.createNewFile();
 		} catch (Exception e) {
 			e.printStackTrace();

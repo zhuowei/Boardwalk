@@ -1,69 +1,77 @@
 package net.zhuoweizhang.boardwalk.potato;
 import java.io.*;
+import java.util.*;
 
-public class LoadMe {
-	public static native void potatoExec(byte[] auxv, String[] args);
-	public static native void setenv(String name, String val);
-	public static native void redirectStdio();
-	public static native void setupBridge();
-	public static native void setupBridgeEGL();
-	public static native int chdir(String path);
-	public static native int setupSigSys();
-	public static String runtimePath;
+import android.os.Environment;
+import android.system.*;
+import com.oracle.dalvik.VMLauncher;
 
-	public static byte[] readAuxV() throws IOException {
-		FileInputStream fis = new FileInputStream(new File("/proc/self/auxv"));
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		byte[] buf = new byte[0x1000];
-		int i;
-		while((i = fis.read(buf)) != -1) {
-			bos.write(buf, 0, i);
-		}
-		fis.close();
-		return bos.toByteArray();
+public final class LoadMe {
+	private LoadMe() {
 	}
 
-	public static String ROOTFS_ARCH = "arm-linux-gnueabihf";
+	public static native int chdir(String path);
+	public static native void setupBridgeEGL();
+	private static native boolean nativeDlopen(String path);
+	public static String runtimePath;
+	private static List<String> propertyArgs = new ArrayList<String>();
+
+	private static void redirectStdio() throws ErrnoException {
+		File extStorage = Environment.getExternalStorageDirectory();
+		File logFile = new File(extStorage, "boardwalk/log_boardwalk2.txt");
+
+		FileDescriptor fd = Os.open(logFile.getAbsolutePath(),
+			OsConstants.O_WRONLY | OsConstants.O_CREAT | OsConstants.O_TRUNC,
+			0666);
+		Os.dup2(fd, OsConstants.STDERR_FILENO);
+		Os.dup2(fd, OsConstants.STDOUT_FILENO);
+	}
+
+	private static void dlopen(String path) {
+		if (!nativeDlopen(path)) {
+			throw new RuntimeException("Cannot load " + path);
+		}
+	}
+
+	private static void loadLibraries(String javaHome) {
+		// It's a pain to set LD_LIBRARY_PATH; pull libnet in by hand
+		dlopen(new File(javaHome, "lib/jli/libjli.so").getAbsolutePath());
+		dlopen(new File(javaHome, "lib/server/libjvm.so").getAbsolutePath());
+		dlopen(new File(javaHome, "lib/libverify.so").getAbsolutePath());
+		dlopen(new File(javaHome, "lib/libjava.so").getAbsolutePath());
+		dlopen(new File(javaHome, "lib/libnet.so").getAbsolutePath());
+	}
+
+	public static void setProperty(String propertyName, String propertyValue) {
+		propertyArgs.add("-Dboardwalk." + propertyName + "=" + propertyValue);
+	}
+
 	public static void exec(String mcClassPath, String[] backArgs) {
 		try {
-			setenv("LD_LIBRARY_PATH", 
-				runtimePath + "/newglibc/lib:" +
-				runtimePath);
-			//setenv("LD_DEBUG", "all");
-			setenv("LD_PRELOAD", runtimePath + "/libboardwalk_preload.so:" +
-				runtimePath + "/jvm/jdk1.8.0_33/jre/lib/arm/libjsig.so");
-			setenv("OVERRIDE_PROC_SELF_EXE", runtimePath + "/jvm/jdk1.8.0_33/jre/bin/java");
+			Os.setenv("LIBGL_MIPMAP", "3", true);
 
-			setenv("LIBGL_MIPMAP", "3");
-			setenv("HOME", "/sdcard/boardwalk");
+			String javaHome = runtimePath + "/jvm";
 
-			setupBridge();
-			byte[] auxv = readAuxV();
-			String[] frontArgs = {runtimePath + "/newglibc/lib/ld-linux-armhf.so.3",
-				runtimePath + "/jvm/jdk1.8.0_33/jre/bin/java",
-				"-server", "-Xms450M", "-Xmx450M",
-				"-cp", mcClassPath,
+			String[] frontArgs = {"java",
+				"-Djava.home=" + javaHome,
+				"-Xms450M", "-Xmx450M",
+				"-classpath", mcClassPath,
 				"-Djava.library.path=" + runtimePath};
-			String[] fullArgs = new String[frontArgs.length + backArgs.length];
+			String[] propertyArgsArr = propertyArgs.toArray(new String[propertyArgs.size()]);
+			String[] fullArgs = new String[frontArgs.length + propertyArgsArr.length + backArgs.length];
 			System.arraycopy(frontArgs, 0, fullArgs, 0, frontArgs.length);
-			System.arraycopy(backArgs, 0, fullArgs, frontArgs.length, backArgs.length);
-			// DEBUG
-			//fullArgs = new String[] {"/data/data/net.zhuoweizhang.boardwalk/app_runtime/busybox"};
-			// END DEBUG
-			System.out.println("Preparing to exec");
+			System.arraycopy(propertyArgsArr, 0, fullArgs, frontArgs.length, propertyArgsArr.length);
+			System.arraycopy(backArgs, 0, fullArgs, frontArgs.length + propertyArgsArr.length, backArgs.length);
 			redirectStdio();
-			if (android.os.Build.VERSION.SDK_INT >= 26) {
-				// Android Oreo and up has seccomp; trap and emulate banned syscalls
-				setupSigSys();
-			}
 			chdir("/sdcard/boardwalk/gamedir");
-			potatoExec(auxv, fullArgs);
+			loadLibraries(javaHome);
+			VMLauncher.launchJVM(fullArgs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	static {
-		System.loadLibrary("boardwalk_masterpotato");
+		System.loadLibrary("boardwalk2_jni");
 	}
 }

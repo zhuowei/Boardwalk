@@ -1,6 +1,7 @@
 package net.zhuoweizhang.boardwalk.model;
 import java.util.*;
 public class MinecraftVersion extends MinecraftVersionList.Version {
+	public MinecraftArguments arguments;
 	public String minecraftArguments;
 	public DependentLibrary[] libraries;
 	public String mainClass;

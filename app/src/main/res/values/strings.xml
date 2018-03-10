@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Boardwalk</string>
+    <string name="app_name">Boardwalk 2</string>
     <string name="login_username_hint">Username or Mojang account e-mail</string>
     <string name="login_password_hint">Password</string>
     <string name="login_is_demo_account">This account doesn\'t seems to have a Minecraft user linked to it. Did you buy Minecraft? You can play the Demo version with the "Play Demo" button below.</string>

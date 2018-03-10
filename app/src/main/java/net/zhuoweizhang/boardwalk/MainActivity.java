@@ -132,7 +132,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		try {
 			inputSender = new InputEventSender();
 			int inputSenderPort = inputSender.runServer();
-			LoadMe.setenv("INPUT_SENDER_PORT", Integer.toString(inputSenderPort));
+			LoadMe.setProperty("inputSenderPort", Integer.toString(inputSenderPort));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -202,8 +202,8 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				calculateMcScale();
 				System.out.println("WidthHeight: " + windowWidth + ":" + windowHeight);
 
-				LoadMe.setenv("POTATO_WINDOW_WIDTH", "" + windowWidth);
-				LoadMe.setenv("POTATO_WINDOW_HEIGHT", "" + windowHeight);
+				LoadMe.setProperty("windowWidth", "" + windowWidth);
+				LoadMe.setProperty("windowHeight", "" + windowHeight);
 
 				String selectedVersion = getSharedPreferences("launcher_prefs", 0).
 					getString("selected_version", VERSION_TO_LAUNCH);
@@ -477,6 +477,22 @@ public class MainActivity extends Activity implements View.OnTouchListener
 
 */
 
+	private static String[] getArgTemplateForVersion(MinecraftVersion version) {
+		if (version.minecraftArguments != null) {
+			return version.minecraftArguments.split(" ");
+		}
+		if (version.arguments != null && version.arguments.game != null) {
+			List<String> filteredVars = new ArrayList<String>(version.arguments.game.size());
+			for (Object o : version.arguments.game) {
+				if (o instanceof String) {
+					filteredVars.add((String)o);
+				}
+			}
+			return filteredVars.toArray(new String[0]);
+		}
+		return new String[0]; // WHAT
+	}
+
 	private static String[] buildMCArgs(Context context, String versionName, MinecraftVersion version) {
 		File gameDir = new File(Environment.getExternalStorageDirectory(), "boardwalk/gamedir");
 		gameDir.mkdirs();
@@ -500,7 +516,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		subs.put("${user_properties}", "{}");
 		subs.put("${user_type}", userType);
 
-		String[] mcArgs = version.minecraftArguments.split(" ");
+		String[] mcArgs = getArgTemplateForVersion(version);
 		for (int i = 0; i < mcArgs.length; i++) {
 			String sub = subs.get(mcArgs[i]);
 			if (sub != null) mcArgs[i] = sub;
