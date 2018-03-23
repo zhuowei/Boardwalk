@@ -213,6 +213,13 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				theEgl.eglMakeCurrent(theEgl.eglGetCurrentDisplay(), EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE,
 					EGL10.EGL_NO_CONTEXT);
 				LoadMe.runtimePath = runtimeDir.getAbsolutePath();
+				try {
+					LoadMe.internalNativeLibPath = MainActivity.this.getPackageManager()
+						.getPackageInfo(MainActivity.this.getPackageName(), 0)
+						.applicationInfo.nativeLibraryDir;
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
 				PotatoRunner runner = new PotatoRunner();
 				try {
 					MinecraftVersion version = MinecraftDownloader.getVersionInfo(selectedVersion);

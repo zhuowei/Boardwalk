@@ -146,7 +146,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 
 	public void doPreLaunch() {
 		// Do we have an interstitial loaded?
-		if (interstitial.isLoaded()) {
+		if (!BuildConfig.DEBUG && interstitial.isLoaded()) {
 			interstitial.show();
 		} else {
 			doLaunch();

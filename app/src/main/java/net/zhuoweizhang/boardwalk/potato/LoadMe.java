@@ -14,6 +14,7 @@ public final class LoadMe {
 	public static native void setupBridgeEGL();
 	private static native boolean nativeDlopen(String path);
 	public static String runtimePath;
+	public static String internalNativeLibPath;
 	private static List<String> propertyArgs = new ArrayList<String>();
 
 	private static void redirectStdio() throws ErrnoException {
@@ -48,15 +49,20 @@ public final class LoadMe {
 
 	public static void exec(String mcClassPath, String[] backArgs) {
 		try {
+			Thread.currentThread().setName("BoardwalkMain");
 			Os.setenv("LIBGL_MIPMAP", "3", true);
 
 			String javaHome = runtimePath + "/jvm";
+
+			// todo: LWJGL 3 vs 2 path
 
 			String[] frontArgs = {"java",
 				"-Djava.home=" + javaHome,
 				"-Xms450M", "-Xmx450M",
 				"-classpath", mcClassPath,
-				"-Djava.library.path=" + runtimePath};
+				"-Djava.library.path=" + runtimePath + ":" + internalNativeLibPath,
+				"-Dos.name=Linux", "-Dorg.lwjgl.util.Debug=true",
+				"-Dorg.lwjgl.opengl.libname=libglshim.so"};
 			String[] propertyArgsArr = propertyArgs.toArray(new String[propertyArgs.size()]);
 			String[] fullArgs = new String[frontArgs.length + propertyArgsArr.length + backArgs.length];
 			System.arraycopy(frontArgs, 0, fullArgs, 0, frontArgs.length);
@@ -65,6 +71,9 @@ public final class LoadMe {
 			redirectStdio();
 			chdir("/sdcard/boardwalk/gamedir");
 			loadLibraries(javaHome);
+			PrintWriter print = new PrintWriter(new File("/sdcard/boardwalk/jvmargs"));
+			print.println(Arrays.toString(fullArgs));
+			print.close();
 			VMLauncher.launchJVM(fullArgs);
 		} catch (Exception e) {
 			e.printStackTrace();

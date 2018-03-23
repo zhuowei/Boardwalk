@@ -9,8 +9,7 @@ public class LibrariesRepository {
 
 	public static File[] localDirs, localDexDirs;
 	public static File downloadDir, dexOutputDir;
-	public static List<String> builtInLibs = Arrays.asList("lwjgl", "lwjgl_util",
-		"lwjgl-openal", "lwjgl-opengl", "lwjgl-jemalloc", "lwjgl-glfw", "lwjgl-stb");
+	public static List<String> builtInLibs = Arrays.asList("lwjgl", "lwjgl_util");
 
 	public static void setLocalLibPath(File[] locals, File downloadDir) {
 		localDirs = locals;
@@ -35,7 +34,7 @@ public class LibrariesRepository {
 	}
 
 	public static boolean isBuiltInToLauncher(String group, String artifact, String version) {
-		return builtInLibs.contains(artifact);
+		return builtInLibs.contains(artifact) && version.charAt(0) == 2;
 	}
 
 	public static boolean isBlackListedLibrary(String group, String artifact, String version) {
