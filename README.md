@@ -1,6 +1,7 @@
 This is the issue tracking repository for Boardwalk.
 
-Download Boardwalk from Google Play: https://play.google.com/store/apps/details?id=net.zhuoweizhang.boardwalk
+~~Download Boardwalk from Google Play: https://play.google.com/store/apps/details?id=net.zhuoweizhang.boardwalk~~
+Boardwalk has been taken down to fix an issue preventing it from running on Android Nougat and onwards. See https://github.com/zhuowei/Boardwalk/wiki/FAQ for more info.
 
 Download APK for latest beta of Boardwalk: http://zhuoweizhang.net/Boardwalk/Boardwalk-release.apk
 
