@@ -25,7 +25,7 @@ import net.zhuoweizhang.boardwalk.util.PlatformUtils;
 public class LauncherActivity extends Activity implements View.OnClickListener, LaunchMinecraftTask.Listener,
 	AdapterView.OnItemSelectedListener {
 
-	public static final String[] versionsSupported = {"1.7.10", "1.8.7"};
+	public static final String[] versionsSupported = {"18w11a"};
 
 	public TextView usernameText, passwordText;
 	public Button loginButton;
@@ -79,7 +79,9 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		updateVersionSpinner();
 		updateUiWithLoginStatus();
 		updateRecommendationText();
-		playButton.setEnabled(false);
+		if (!BuildConfig.DEBUG) {
+			playButton.setEnabled(false);
+		}
 		handler.sendEmptyMessageDelayed(1337, 1000*30); // 30 seconds
 		initAds();
 		refreshToken();

@@ -29,6 +29,7 @@ public class ExtractRuntime implements Runnable {
 			extractAsset("busybox");
 			extractTar("jre.tar.xz", new File(runtimeDir, "jvm").getAbsolutePath());
 			extractAsset("lwjgl_override.jar");
+			extractTar("lwjgl3.tar.xz", new File(runtimeDir, "lwjgl3").getAbsolutePath());
 /* FIXME!
 			extractAsset("libboardwalk_preload.so");
 			extractAsset("liblwjgl.so");

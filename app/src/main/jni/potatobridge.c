@@ -12,3 +12,8 @@ JNIEXPORT void JNICALL Java_net_zhuoweizhang_boardwalk_potato_LoadMe_setupBridge
 	potatoBridge.eglReadSurface = eglGetCurrentSurface(EGL_READ);
 	potatoBridge.eglDrawSurface = eglGetCurrentSurface(EGL_DRAW);
 }
+
+// Called from JNI_OnLoad of liblwjgl_opengl32
+void boardwalk2_openGLOnLoad() {
+	eglMakeCurrent(potatoBridge.eglDisplay, potatoBridge.eglDrawSurface, potatoBridge.eglReadSurface, potatoBridge.eglContext);
+}

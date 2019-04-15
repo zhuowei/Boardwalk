@@ -47,8 +47,17 @@ public final class LoadMe {
 		propertyArgs.add("-Dboardwalk." + propertyName + "=" + propertyValue);
 	}
 
+	private static void startStrace(int pid) throws Exception {
+		File extStorage = Environment.getExternalStorageDirectory();
+		String[] straceArgs = new String[] {runtimePath + "/strace",
+			"-o", new File(extStorage, "boardwalk/stracelog").getAbsolutePath(), "-f", "-p", "" + pid};
+		System.out.println("strace args: " + Arrays.toString(straceArgs));
+		Runtime.getRuntime().exec(straceArgs);
+	}
+
 	public static void exec(String mcClassPath, String[] backArgs) {
 		try {
+			File extStorage = Environment.getExternalStorageDirectory();
 			Thread.currentThread().setName("BoardwalkMain");
 			Os.setenv("LIBGL_MIPMAP", "3", true);
 
@@ -62,18 +71,21 @@ public final class LoadMe {
 				"-classpath", mcClassPath,
 				"-Djava.library.path=" + runtimePath + ":" + internalNativeLibPath,
 				"-Dos.name=Linux", "-Dorg.lwjgl.util.Debug=true",
-				"-Dorg.lwjgl.opengl.libname=libglshim.so"};
+				"-Dorg.lwjgl.opengl.libname=libglshim.so", "-Dorg.lwjgl.util.DebugFunctions=true"};
 			String[] propertyArgsArr = propertyArgs.toArray(new String[propertyArgs.size()]);
 			String[] fullArgs = new String[frontArgs.length + propertyArgsArr.length + backArgs.length];
 			System.arraycopy(frontArgs, 0, fullArgs, 0, frontArgs.length);
 			System.arraycopy(propertyArgsArr, 0, fullArgs, frontArgs.length, propertyArgsArr.length);
 			System.arraycopy(backArgs, 0, fullArgs, frontArgs.length + propertyArgsArr.length, backArgs.length);
 			redirectStdio();
-			chdir("/sdcard/boardwalk/gamedir");
+			chdir(new File(extStorage, "boardwalk/gamedir").getAbsolutePath());
 			loadLibraries(javaHome);
-			PrintWriter print = new PrintWriter(new File("/sdcard/boardwalk/jvmargs"));
+			PrintWriter print = new PrintWriter(new File(extStorage, "boardwalk/jvmargs"));
 			print.println(Arrays.toString(fullArgs));
 			print.close();
+			if (new File(extStorage, "boardwalk/strace").exists()) {
+				startStrace(android.os.Process.myTid());
+			}
 			VMLauncher.launchJVM(fullArgs);
 		} catch (Exception e) {
 			e.printStackTrace();

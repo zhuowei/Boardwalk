@@ -112,7 +112,7 @@ public class MinecraftLaunch {
 
 	private static String getLWJGLClassPath(MinecraftVersion version, String runtimePath) {
 		if (isUsingLWJGL3(version)) {
-			return runtimePath + "/lwjgl_override.jar:";
+			return runtimePath + "/lwjgl_override.jar:" + runtimePath + "/lwjgl3/*:";
 		}
 		return runtimePath + "/lwjgl.jar:" + runtimePath + "/lwjgl_util.jar:" +
 			runtimePath + "/librarylwjglopenal-20100824.jar:";
