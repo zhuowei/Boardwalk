@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <net.zhuoweizhang.boardwalk.BoardwalkGLSurfaceView android:id="@+id/main_gl_surface"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"/>
+    <include layout="@layout/overlay"
+        android:id="@+id/main_control_overlay"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:alpha="0.7"/>
+</merge>

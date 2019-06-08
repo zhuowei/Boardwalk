@@ -1,0 +1,8 @@
+renderDistance:2
+guiScale:0
+particles:2
+advancedOpengl:false
+maxFps:260
+fancyGraphics:false
+fullscreen:true
+enableVsync:false

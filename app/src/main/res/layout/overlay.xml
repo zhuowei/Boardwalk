@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <!--<Button
+        android:id="@+id/show_controls"
+        android:layout_width="wrap_content"
+        android:layout_height="30dip"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="2dip"
+        android:layout_marginTop="2dip"
+        android:background="@drawable/control_button"
+        android:text="@string/controls" />-->
+    
+    <Button
+        android:id="@+id/control_debug"
+        android:layout_width="wrap_content"
+        android:layout_height="30dip"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="2dip"
+        android:layout_marginTop="2dip"
+        android:background="@drawable/control_button_sharp"
+        android:text="@string/control_debug" />
+    
+   <Button
+        android:id="@+id/control_talk"
+        android:layout_width="wrap_content"
+        android:layout_height="30dip"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="2dip"
+        android:layout_marginTop="2dip"
+        android:layout_toRightOf="@+id/control_debug"
+        android:background="@drawable/control_button_sharp"
+        android:text="@string/control_chat" />
+
+    <Button
+        android:id="@+id/control_keyboard"
+        android:layout_width="wrap_content"
+        android:layout_height="30dip"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="2dip"
+        android:layout_marginTop="2dip"
+        android:layout_toRightOf="@+id/control_talk"
+        android:background="@drawable/control_button_sharp"
+        android:text="@string/control_keyboard" />
+    <Button
+        android:id="@+id/control_thirdperson"
+        android:layout_width="wrap_content"
+        android:layout_height="30dip"
+        android:layout_marginLeft="2dip"
+        android:layout_marginRight="2dip"
+        android:layout_marginTop="2dip"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/control_debug"
+        android:background="@drawable/control_button_sharp"
+        android:text="@string/control_thirdperson" />
+
+    
+    <Button
+        android:id="@+id/control_down"
+        android:layout_width="50dip"
+        android:layout_height="50dip"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="14dp"
+        android:layout_marginLeft="68dp"
+        android:background="@drawable/control_button_sharp"
+        android:text="@string/control_down"
+        android:textSize="32sp" />
+    
+	<Button
+	    android:id="@+id/control_up"
+	    android:layout_width="50dip"
+	    android:layout_height="50dip"
+	    android:layout_alignParentBottom="true"
+	    android:layout_alignParentLeft="true"
+	    android:layout_marginBottom="122dp"
+	    android:layout_marginLeft="68dp"
+	    android:background="@drawable/control_button_sharp"
+	    android:text="@string/control_up"
+	    android:textSize="32sp" />
+
+    <Button
+        android:id="@+id/control_left"
+        android:layout_width="50dip"
+        android:layout_height="50dip"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="68dp"
+        android:layout_marginLeft="14dp"
+        android:background="@drawable/control_button_sharp"
+        android:text="@string/control_left"
+        android:textSize="32sp" />
+    
+    <Button
+        android:id="@+id/control_right"
+        android:layout_width="50dip"
+        android:layout_height="50dip"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="68dp"
+        android:layout_marginLeft="122dp"
+        android:background="@drawable/control_button_sharp"
+        android:text="@string/control_right"
+        android:textSize="32sp" />
+    
+    <Button
+        android:id="@+id/control_jump"
+        android:layout_width="50dip"
+        android:layout_height="50dip"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="68dp"
+        android:layout_marginLeft="68dp"
+        android:background="@drawable/control_button_sharp"
+        android:text="@string/control_jump"
+        android:textSize="32sp" />
+    
+	<Button
+	    android:id="@+id/control_primary"
+	    android:layout_width="50dip"
+	    android:layout_height="50dip"
+	    android:layout_alignParentBottom="true"
+	    android:layout_alignParentLeft="true"
+	    android:layout_marginBottom="122dp"
+	    android:layout_marginLeft="14dp"
+	    android:background="@drawable/control_button_sharp"
+	    android:text="@string/control_primary"
+	    android:textSize="20sp" />
+    
+    <Button
+        android:id="@+id/control_secondary"
+        android:layout_width="50dip"
+        android:layout_height="50dip"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="122dp"
+        android:layout_marginLeft="122dp"
+        android:background="@drawable/control_button_sharp"
+        android:text="@string/control_secondary"
+        android:textSize="20sp" />
+    
+ 	<Button
+ 	    android:id="@+id/control_shift"
+ 	    android:layout_width="50dip"
+ 	    android:layout_height="50dip"
+ 	    android:layout_alignParentBottom="true"
+ 	    android:layout_alignParentLeft="true"
+ 	    android:layout_marginBottom="14dp"
+ 	    android:layout_marginLeft="14dp"
+ 	    android:background="@drawable/control_button_sharp"
+ 	    android:text="@string/control_shift"
+ 	    android:textSize="20sp" />
+ 	
+ 	<Button
+ 	    android:id="@+id/control_inventory"
+ 	    android:layout_width="50dip"
+ 	    android:layout_height="50dip"
+ 	    android:layout_alignParentBottom="true"
+ 	    android:layout_alignParentLeft="true"
+ 	    android:layout_marginBottom="14dp"
+ 	    android:layout_marginLeft="122dp"
+ 	    android:background="@drawable/control_button_sharp"
+ 	    android:text="@string/control_inventory"
+ 	    android:textSize="20sp" />
+
+</RelativeLayout>

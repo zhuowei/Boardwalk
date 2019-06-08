@@ -1,0 +1,3 @@
+include ':app', ':makeshift', ':glshim'
+include ':aFileChooser'
+include ':openalsoft'

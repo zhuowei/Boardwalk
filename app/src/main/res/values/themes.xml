@@ -1,0 +1,6 @@
+<resources>
+    <style name="BoardwalkTheme" parent="@style/AppTheme">
+    </style>
+    <style name="BoardwalkActionBarStyle" parent="@style/AppTheme">
+    </style>
+</resources>

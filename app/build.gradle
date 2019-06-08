@@ -1,0 +1,58 @@
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        LongJunyu {
+            keyAlias 'LongJunyu'
+            keyPassword 'ljy521429'
+        }
+    }
+    compileSdkVersion 27
+    defaultConfig {
+        applicationId "net.zhuoweizhang.boardwalk"
+        minSdkVersion 19
+        targetSdkVersion 27
+        versionCode 10
+        versionName '1.2'
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.LongJunyu
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable false
+            jniDebuggable false
+            signingConfig signingConfigs.LongJunyu
+            renderscriptDebuggable false
+            zipAlignEnabled true
+        }
+    }
+    buildToolsVersion '28.0.3'
+    dexOptions {
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    productFlavors {
+    }
+    externalNativeBuild {
+        ndkBuild {
+            path file('src/main/jni/Application.mk')
+            path file('src/main/jni/Android.mk')
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation project(':makeshift')
+    implementation project(':aFileChooser')
+    implementation project(':openalsoft')
+    implementation project(':glshim')
+}

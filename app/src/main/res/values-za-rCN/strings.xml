@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Boardwalk</string>
+    <string name="login_username_hint">用户名或Mojang邮箱账号</string>
+    <string name="login_password_hint">密码</string>
+    <string name="login_is_demo_account">这个账户似乎没有一个Minecraft用户与之关联。你是否购买了Minecraft？你可以点击下方的试玩按钮体验试玩版本</string>
+    <string name="login_error">无法登陆：</string>
+    <string name="login_logging_in">登陆中...</string>
+    <string name="login_button">登陆</string>
+    <string name="login_extra_info_text">这个版本的Boardwalk是实验性的--创建世界可能需要5分钟，吧这个应用放到后台会导致Minecraft崩溃。这些问题正在解决中，可能会在以后的版本中得到解决。</string>
+    <string name="login_import_credentials">从launcher_profiles.json文件导入凭证</string>
+    <string name="login_import_credentials_info">您可以从官方电脑Minecraft启动器导入您的登录凭证，而不是在此输入您的用户名和密码。为此，请在您的计算机上登录Minecraft，然后复制 minecraft/launcher_profiles.json 最后，单击“确定”选择并导入启动器配置文件。请注意，导入过程会将您从计算机的启动器上注销。</string>
+    <string name="login_import_resource_pack">导入资源包</string>
+    <string name="recommendation_art">您的设备支持安卓ART，这可能会使Minecraft运行得更快。您可以转到 设置-开发人员设置-选择运行模式-ART 来开启该模式。（某些应用可能不兼容ART模式，您可能需要使用Bardwalk后切换回去）</string>
+    <string name="recommendation_memory">很遗憾，您的设备不受支持，因为这个应用程序需要1GB的内存来将Minecraft转换为安卓可执行的文件。如果您尝试启动，应用程序可能会强制关闭。</string>
+    <string name="recommendation_dual_core">很遗憾，您的设备不受支持，因为此应用程序需要双核或更好的CPU。否则，应用程序将运行非常缓慢。</string>
+    <string name="play_regular">启动Minecraft</string>
+    <string name="play_offline">启动</string>
+    <string name="play_demo">试玩</string>
+    <string name="convert_populating_working_directory">配置工作目录</string>
+    <string name="convert_downloading">下载中</string>
+    <string name="convert_converting">转换中</string>
+    <string name="convert_preparing_to_launch_minecraft">正在准备启动Minecraft</string>
+    <string name="export_log">导出日志</string>
+    <string name="control_keyboard">键盘</string>
+    <string name="control_chat">聊天</string>
+    <string name="control_debug">调试</string>
+    <string name="controls">控制</string>
+    <string name="about_app">关于</string>
+    <string name="select_file">选择文件</string>
+    <string name="about_librarycredits">许多开源贡献者的工作使得这个应用成为可能。使用的一些库是glShim（已更名为GL4ES）、LWJGL、Gson、dx和jarjar。完整的列表和适用的许可能够在 http://git.io/2cWyVg 上找到，特别感谢PitSeb和lunixbochs编写的glShim，这使该应用成为可能。此应用程序不隶属于 MojangAB。Minecraft/TM 2009-2013 Mojang / Notch.</string>
+    <string name="about_thanks">感谢 jose-vm, sjwoo1210, bmx22c, MCMrARM 和其他所有对Boardwalk做出贡献的人。</string>
+</resources>
