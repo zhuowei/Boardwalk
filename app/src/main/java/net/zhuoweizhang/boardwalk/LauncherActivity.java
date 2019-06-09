@@ -231,8 +231,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 			case REQUEST_BROWSE_FOR_CREDENTIALS:
 				if (resultCode == RESULT_OK) {  
 					final Uri uri = data.getData();
-					//TODO:下一行语句不适用于新版的aFileChooser，需要修改，暂时使用一个null看效果
-					File file = FileUtils.getFile(null,uri);
+					File file = FileUtils.getFile(uri);
 					new ImportVanillaAuthTask(this).execute(file.getAbsolutePath());
 				}
 				break;
@@ -240,7 +239,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 				if (resultCode == RESULT_OK) {
 					final Uri uri = data.getData();
 					//TODO:
-					File file = FileUtils.getFile(null,uri);
+					File file = FileUtils.getFile(uri);
 					new ImportResourcePackTask(this).execute(file);
 				}
 				break;
