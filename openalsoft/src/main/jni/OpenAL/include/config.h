@@ -17,8 +17,6 @@
 #define HAVE_OPENSLES 1
 #endif
 
-#define HAVE_AUDIOTRACK 1
-
 // For throttling AlSource.c
 
 #ifndef MAX_SOURCES_LOW
@@ -86,8 +84,10 @@
 /* Define if we have the __int64 type */
 /* #cmakedefine HAVE___INT64 */
 
+#ifndef SIZEOF_LONG
 /* Define to the size of a long int type */
 #define SIZEOF_LONG 4
+#endif
 
 /* Define to the size of a long long int type */
 #define SIZEOF_LONG_LONG 8
@@ -95,8 +95,10 @@
 /* Define to the size of an unsigned int type */
 #define SIZEOF_UINT 4
 
+#ifndef SIZEOF_VOIDP
 /* Define to the size of a void pointer type */
 #define SIZEOF_VOIDP 4
+#endif
 
 /* Define if we have GCC's destructor attribute */
 #define HAVE_GCC_DESTRUCTOR 1

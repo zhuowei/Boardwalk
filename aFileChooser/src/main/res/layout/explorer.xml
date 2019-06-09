@@ -14,7 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  -->
-<resources>
-    <string name="app_name">AFileChooser</string>
-    <string name="select_file">Choose file from SD</string>
-</resources>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <ListView
+        android:id="@+id/android:list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"/>
+
+    <TextView
+        android:id="@+id/android:empty"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:text="Empty Directory"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+</LinearLayout>

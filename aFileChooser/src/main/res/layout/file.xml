@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- * Copyright (C) 2013 Paul Burke
+ * Copyright (C) 20011 Paul Burke
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 -->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/fileChooserName"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight" />
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:orientation="horizontal" >
+
+    <ImageView
+        android:id="@+id/file_icon"
+        style="@style/fileIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp" />
+
+    <TextView
+        android:id="@+id/file_name"
+        style="@style/fileName"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+</LinearLayout>
