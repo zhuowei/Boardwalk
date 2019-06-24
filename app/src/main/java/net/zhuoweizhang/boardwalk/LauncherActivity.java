@@ -21,6 +21,7 @@ import android.net.Uri;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
+import android.support.v7.*;
 
 import com.ipaulpro.afilechooser.FileChooserActivity;
 import com.ipaulpro.afilechooser.utils.FileUtils;
