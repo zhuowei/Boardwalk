@@ -1,3 +1,13 @@
+/*
+	*文件名：LauncherActivity.java
+	*作者：Zhuowei Zhang
+	*版权：Copyright (c) 2014 Zhuowei Zhang
+	
+	*修改次数：第一次修改
+	*修改人：Junyu Long
+	*修改日期：2019.06.24
+	*描述：新增 SD卡读写的动态提权
+*/
 package net.zhuoweizhang.boardwalk;
 
 import java.io.File;
@@ -49,6 +59,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 	};
 
 	public void onCreate(Bundle icicle) {
+		requestStoragePower();
 		super.onCreate(icicle);
 		setContentView(R.layout.launcher_layout);
 		loginButton = (Button) findViewById(R.id.launcher_login_button);
@@ -321,4 +332,16 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 		if (!isLoggedIn()) return;
 		new RefreshAuthTokenTask(this).execute();
 	}
+	
+	public void requestStoragePower() {
+		if (ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED)
+		{
+			if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_EXTERNAL_STORAGE))
+			{
+				//TODO:对话框提示用户提权原因.
+				}else{
+				ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,}, 1);
+            }
+		}
+		
 }
