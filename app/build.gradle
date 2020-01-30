@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    buildToolsVersion "27.0.3"
-    compileSdkVersion 23
+    buildToolsVersion "29.0.2"
+    compileSdkVersion 26
     defaultConfig {
         applicationId "net.zhuoweizhang.boardwalk.charm"
         minSdkVersion 26
@@ -29,6 +29,9 @@ android {
         ndkBuild {
             path "src/main/jni/Android.mk"
         }
+    }
+    lintOptions {
+        abortOnError false
     }
 }
 

@@ -2,6 +2,12 @@
 
 This is the source code for Boardwalk, a Minecraft Java Edition launcher for Android.
 
+CI status of just the login screen:
+
+![Build Status](https://github.com/zhuowei/Boardwalk/workflows/Build%20Boardwalk/badge.svg)
+
+(There's currently no plan to get Boardwalk 2.0 working. Sorry :( )
+
 # Branches
 
 This branch contains the source for Boardwalk 2.0 (the current development branch).
