@@ -9,4 +9,11 @@ public class MinecraftVersion extends MinecraftVersionList.Version {
 	public String assets;
 	public String inheritsFrom;
 	public String jar;
+	public Downloads downloads;
+	public static class Downloads {
+		public Download client;
+	}
+	public static class Download {
+		public String url;
+	}
 }

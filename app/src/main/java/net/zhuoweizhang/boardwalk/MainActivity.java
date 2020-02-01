@@ -43,7 +43,7 @@ import net.zhuoweizhang.boardwalk.util.*;
 
 public class MainActivity extends Activity implements View.OnTouchListener
 {
-	public static final String VERSION_TO_LAUNCH = "1.8.7";
+	public static final String VERSION_TO_LAUNCH = "1.15.2";
 	public static final String initText = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
 					"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA ";
 
@@ -542,7 +542,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			try {
 				LoadMe.exec(mcClassPath, mcArgs);
 			} catch (Exception e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 	}

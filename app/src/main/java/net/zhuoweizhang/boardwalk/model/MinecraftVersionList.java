@@ -14,6 +14,7 @@ public class MinecraftVersionList {
 		public String /*Date*/ time;
 		public String /*Date*/ releaseTime;
 		public String type;
+		public String url;
 	}
 
 	public Map<String, String> latest;

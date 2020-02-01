@@ -10,6 +10,7 @@ import net.zhuoweizhang.boardwalk.model.*;
 public class MinecraftDownloader {
 
 	public static final String MINECRAFT_ASSETS = "http://s3.amazonaws.com/Minecraft.Download/";
+	public static final String MINECRAFT_VERSION_MANIFEST = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
 
 	public static boolean useMavenCentral = false;
 
@@ -18,13 +19,22 @@ public class MinecraftDownloader {
 	public static File versionsDir;
 
 	public static MinecraftVersionList downloadVersionList() throws IOException {
-		String versions = DownloadUtils.downloadString(MINECRAFT_ASSETS + "versions/versions.json");
+		String versions = DownloadUtils.downloadString(MINECRAFT_VERSION_MANIFEST);
 		MinecraftVersionList list = gson.fromJson(versions, MinecraftVersionList.class);
 		return list;
 	}
 
 	public static MinecraftVersion downloadVersionInfo(String versionName) throws IOException {
-		String versionJson = DownloadUtils.downloadString(MINECRAFT_ASSETS + "versions/" + versionName + "/" + versionName + ".json");
+		// TODO(zhuowei): don't double download this?
+		MinecraftVersionList versionList = downloadVersionList();
+		MinecraftVersionList.Version versionMeta = null;
+		for (MinecraftVersionList.Version version: versionList.versions) {
+			if (version.id.equals(versionName)) {
+				versionMeta = version;
+				break;
+			}
+		}
+		String versionJson = DownloadUtils.downloadString(versionMeta.url);
 		MinecraftVersion version = gson.fromJson(versionJson, MinecraftVersion.class);
 		String pathName = version.id + "/" + version.id + ".json";
 		File versionFile = new File(versionsDir, pathName);
@@ -71,7 +81,11 @@ public class MinecraftDownloader {
 
 	public static void downloadMinecraftVersion(MinecraftVersion version) throws IOException {
 		String pathName = version.id + "/" + version.id + ".jar";
-		DownloadUtils.downloadFile(MINECRAFT_ASSETS + "versions/" + pathName, new File(versionsDir, pathName));
+		String url = MINECRAFT_ASSETS + "versions/" + pathName;
+		if (version.downloads != null) {
+			url = version.downloads.client.url;
+		}
+		DownloadUtils.downloadFile(url, new File(versionsDir, pathName));
 	}
 
 	public static MinecraftVersion getVersionInfo(String versionName) throws IOException {

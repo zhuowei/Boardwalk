@@ -71,7 +71,8 @@ public final class LoadMe {
 				"-classpath", mcClassPath,
 				"-Djava.library.path=" + runtimePath + ":" + internalNativeLibPath,
 				"-Dos.name=Linux", "-Dorg.lwjgl.util.Debug=true",
-				"-Dorg.lwjgl.opengl.libname=libglshim.so", "-Dorg.lwjgl.util.DebugFunctions=true"};
+				"-Dorg.lwjgl.opengl.libname=libglshim.so", "-Dorg.lwjgl.util.DebugFunctions=true",
+				"-Dorg.lwjgl.system.bundledLibrary.nameMapper=legacy" /* FIXME(zhuowei) don't */};
 			String[] propertyArgsArr = propertyArgs.toArray(new String[propertyArgs.size()]);
 			String[] fullArgs = new String[frontArgs.length + propertyArgsArr.length + backArgs.length];
 			System.arraycopy(frontArgs, 0, fullArgs, 0, frontArgs.length);

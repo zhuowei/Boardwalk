@@ -42,7 +42,7 @@ public class ExtractRuntime implements Runnable {
 */
 			versionFile.createNewFile();
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -62,13 +62,21 @@ public class ExtractRuntime implements Runnable {
 		AssetsUtil.extractFileFromAssets(context, tar, tempOut);
 		File outFile = new File(out);
 		outFile.mkdirs();
-		String[] argsNew = new String[]{new File(runtimeDir, "busybox").getAbsolutePath(), "tar", "xJf",
+		String[] argsNew = new String[]{new File(runtimeDir, "busybox").getAbsolutePath(), "tar", "xJf", "-v",
 			tempOut.getAbsolutePath(), "-C", out};
-		doExec(argsNew);
+		Object[] result = doExec(argsNew);
+		int returnValue = (Integer) result[0];
+		if (returnValue != 0) {
+			// TODO(zhuowei): this DOES NOT WORK on Android 10 (and maybe below) for some reason?
+			// I can't debug it; tar always returns 159.
+			// Manually running it in the Android terminal works just fine though.
+			// Will rewrite using Apache Commons Compress and do it entirely in Java.
+			//throw new IllegalStateException("tar returned " + returnValue + " " + (String)result[1]);
+		}
 		//tempOut.delete();
 	}
 
-	public static void doExec(String[] argsNew) throws Exception {
+	public static Object[] doExec(String[] argsNew) throws Exception {
 		Process p = new ProcessBuilder(argsNew).redirectErrorStream(true).start();
 		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		String line;
@@ -78,6 +86,7 @@ public class ExtractRuntime implements Runnable {
 			buf.append(line);
 			buf.append('\n');
 		}
-		p.waitFor();
+		int result = p.waitFor();
+		return new Object[] {result, buf.toString()};
 	}
 }

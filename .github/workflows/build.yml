@@ -16,5 +16,8 @@ jobs:
       with:
         java-version: 1.8
 
+    - name: Download libraries
+      run: tools/download_libraries.sh
+
     - name: Build with Gradle
       run: ./gradlew build
