@@ -138,6 +138,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 		}
 
 		glSurfaceView = (GLSurfaceView) findViewById(R.id.main_gl_surface);
+		glSurfaceView.setEGLContextClientVersion(2); //gl4es
 		glSurfaceView.setOnTouchListener(new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent e) {
 				int x = ((int) e.getX()) / scaleFactor;

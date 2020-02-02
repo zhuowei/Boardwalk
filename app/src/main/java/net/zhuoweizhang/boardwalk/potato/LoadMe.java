@@ -55,11 +55,15 @@ public final class LoadMe {
 		Runtime.getRuntime().exec(straceArgs);
 	}
 
+	private static native void initializeGl4Es(String path);
+
 	public static void exec(String mcClassPath, String[] backArgs) {
 		try {
 			File extStorage = Environment.getExternalStorageDirectory();
 			Thread.currentThread().setName("BoardwalkMain");
-			Os.setenv("LIBGL_MIPMAP", "3", true);
+			// Not sure if this is still needed on gl4es
+			//Os.setenv("LIBGL_MIPMAP", "3", true);
+			Os.setenv("LIBGL_ES", "2", true);
 
 			String javaHome = runtimePath + "/jvm";
 
@@ -71,7 +75,7 @@ public final class LoadMe {
 				"-classpath", mcClassPath,
 				"-Djava.library.path=" + runtimePath + ":" + internalNativeLibPath,
 				"-Dos.name=Linux", "-Dorg.lwjgl.util.Debug=true",
-				"-Dorg.lwjgl.opengl.libname=libglshim.so", "-Dorg.lwjgl.util.DebugFunctions=true",
+				"-Dorg.lwjgl.opengl.libname=libgl4es.so", "-Dorg.lwjgl.util.DebugFunctions=true",
 				"-Dorg.lwjgl.system.bundledLibrary.nameMapper=legacy" /* FIXME(zhuowei) don't */};
 			String[] propertyArgsArr = propertyArgs.toArray(new String[propertyArgs.size()]);
 			String[] fullArgs = new String[frontArgs.length + propertyArgsArr.length + backArgs.length];
@@ -87,6 +91,10 @@ public final class LoadMe {
 			if (new File(extStorage, "boardwalk/strace").exists()) {
 				startStrace(android.os.Process.myTid());
 			}
+
+			// preinit gl4es so it can measure the device's list of extensions
+			initializeGl4Es(internalNativeLibPath + "/libgl4es.so");
+
 			VMLauncher.launchJVM(fullArgs);
 		} catch (Exception e) {
 			e.printStackTrace();
