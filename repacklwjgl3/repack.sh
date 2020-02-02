@@ -11,7 +11,7 @@ do
 	cp $i/$i.jar ../repack/
 done
 cd ../repack
-tar cJf ../lwjgl3.tar.xz .
+tar cJf ../lwjgl3.tar.xz *
 cd ..
 mkdir ../app/src/main/assets || true
 cp lwjgl3.tar.xz ../app/src/main/assets/

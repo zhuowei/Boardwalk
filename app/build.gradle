@@ -39,6 +39,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation 'com.google.android.gms:play-services-ads:11.8.0'
+    implementation 'org.apache.commons:commons-compress:1.19'
+    implementation 'org.tukaani:xz:1.8'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:0.5'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2'

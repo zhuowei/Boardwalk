@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.Manifest;
 import android.app.*;
 import android.content.*;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.*;
 import android.view.*;
@@ -48,6 +50,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 
 	public static final int REQUEST_BROWSE_FOR_CREDENTIALS = 1013; // date when this constant was added
 	public static final int REQUEST_BROWSE_FOR_RESOURCE_PACK = 1014;
+	private static final int REQUEST_STORAGE_PERMISSION = 1015;
 
 	private Handler handler = new Handler() {
 		@Override
@@ -94,6 +97,7 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 				extractThread.start();
 			}
 		}
+		grabPermissionsIfNeeded();
 	}
 
 	@Override
@@ -376,6 +380,30 @@ public class LauncherActivity extends Activity implements View.OnClickListener, 
 				extractThread.join();
 			} catch (InterruptedException lolnope) {
 				lolnope.printStackTrace();
+			}
+		}
+	}
+
+	private void grabPermissionsIfNeeded() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			grabPermissions();
+		}
+	}
+
+	private boolean grabPermissions() {
+		if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+			requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERMISSION);
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+		if (requestCode == REQUEST_STORAGE_PERMISSION) {
+			if (permissions.length >= 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+				// todo?
+			} else {
 			}
 		}
 	}

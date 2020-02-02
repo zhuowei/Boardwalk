@@ -2,8 +2,12 @@ package net.zhuoweizhang.boardwalk.potato;
 
 import java.io.*;
 import android.content.*;
+import android.content.res.AssetManager;
 import android.os.Environment;
 import net.zhuoweizhang.boardwalk.util.*;
+import org.apache.commons.compress.archivers.examples.Expander;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 
 public class ExtractRuntime implements Runnable {
 	private Context context;
@@ -26,7 +30,6 @@ public class ExtractRuntime implements Runnable {
 		try {
 			File versionFile = new File(runtimeDir, VERSION_FLAG_NAME);
 			versionFile.delete();
-			extractAsset("busybox");
 			extractTar("jre.tar.xz", new File(runtimeDir, "jvm").getAbsolutePath());
 			extractAsset("lwjgl_override.jar");
 			extractTar("lwjgl3.tar.xz", new File(runtimeDir, "lwjgl3").getAbsolutePath());
@@ -56,37 +59,22 @@ public class ExtractRuntime implements Runnable {
 	}
 
 	public void extractTar(String tar, String out) throws Exception {
-		tempDir.mkdirs();
-		File tempOut = new File(tempDir, tar);
-		tempOut.delete();
-		AssetsUtil.extractFileFromAssets(context, tar, tempOut);
 		File outFile = new File(out);
 		outFile.mkdirs();
-		String[] argsNew = new String[]{new File(runtimeDir, "busybox").getAbsolutePath(), "tar", "xJf", "-v",
-			tempOut.getAbsolutePath(), "-C", out};
-		Object[] result = doExec(argsNew);
-		int returnValue = (Integer) result[0];
-		if (returnValue != 0) {
-			// TODO(zhuowei): this DOES NOT WORK on Android 10 (and maybe below) for some reason?
-			// I can't debug it; tar always returns 159.
-			// Manually running it in the Android terminal works just fine though.
-			// Will rewrite using Apache Commons Compress and do it entirely in Java.
-			//throw new IllegalStateException("tar returned " + returnValue + " " + (String)result[1]);
-		}
-		//tempOut.delete();
-	}
+		IoUtil.clearDirectory(outFile);
 
-	public static Object[] doExec(String[] argsNew) throws Exception {
-		Process p = new ProcessBuilder(argsNew).redirectErrorStream(true).start();
-		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		String line;
-		StringBuffer buf = new StringBuffer();
-		while((line = in.readLine()) != null) {
-			System.out.println(line);
-			buf.append(line);
-			buf.append('\n');
+		AssetManager assets = context.getAssets();
+		InputStream is = null;
+		try {
+			is = assets.open(tar);
+			TarArchiveInputStream tarIs = new TarArchiveInputStream(
+					new XZCompressorInputStream(new BufferedInputStream(is)));
+
+			new Expander().expand(tarIs, outFile);
+		} finally {
+			if (is != null) {
+				is.close();
+			}
 		}
-		int result = p.waitFor();
-		return new Object[] {result, buf.toString()};
 	}
 }
