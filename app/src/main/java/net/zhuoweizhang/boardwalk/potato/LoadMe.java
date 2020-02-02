@@ -71,7 +71,7 @@ public final class LoadMe {
 
 			String[] frontArgs = {"java",
 				"-Djava.home=" + javaHome,
-				"-Xms450M", "-Xmx450M",
+				"-Xms1G", "-Xmx1G",
 				"-classpath", mcClassPath,
 				"-Djava.library.path=" + runtimePath + ":" + internalNativeLibPath,
 				"-Dos.name=Linux", "-Dorg.lwjgl.util.Debug=true",

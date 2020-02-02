@@ -194,10 +194,17 @@ public class MainActivity extends Activity implements View.OnTouchListener
 			}
 		});
 
-		glSurfaceView.setRenderer(new GLSurfaceView.Renderer() {
+        glSurfaceView.setRenderer(new GLSurfaceView.Renderer() {
+            private int framesDrawn = 0;
 			public void onDrawFrame(GL10 gl) {
+			    if (framesDrawn++ > 1) {
+                    relaunchIntoMinecraft();
+                }
 			}
 			public void onSurfaceCreated(GL10 gl, javax.microedition.khronos.egl.EGLConfig config) {
+            }
+
+            private void relaunchIntoMinecraft() {
 				windowWidth = glSurfaceView.getWidth() / scaleFactor;
 				windowHeight = glSurfaceView.getHeight() / scaleFactor;
 				calculateMcScale();
@@ -230,7 +237,7 @@ public class MainActivity extends Activity implements View.OnTouchListener
 				} catch (IOException ie) {
 					throw new RuntimeException(ie);
 				}
-				new Thread(runner).start();
+                new Thread(runner).start();
 
 				while (true) {
 					try {

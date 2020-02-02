@@ -796,7 +796,15 @@ public class GLFW {
     }
     public static void glfwPollEvents() {}
     public static void glfwWaitEvents() {}
-    public static void glfwWaitEventsTimeout(double timeout) {}
+    public static void glfwWaitEventsTimeout(double timeout) {
+        // Boardwalk: this isn't how you do a frame limiter, but oh well
+        System.out.println("Frame limiter");
+        try {
+            Thread.sleep((long)(timeout * 1000));
+        } catch (InterruptedException ie) {
+        }
+        System.out.println("Out of the frame limiter");
+    }
     public static void glfwPostEmptyEvent() {}
     public static int glfwGetInputMode(@NativeType("GLFWwindow *") long window, int mode) {
         return 0;
@@ -893,8 +901,11 @@ public class GLFW {
     public static String glfwGetClipboardString(@NativeType("GLFWwindow *") long window) {
         return "Clipboard";
     }
+    private static long initialTime = System.nanoTime();
     public static double glfwGetTime() {
-        return 0;
+        // Boardwalk: just use system timer
+        System.out.println("glfwGetTime");
+        return (System.nanoTime() - initialTime) / 1.e9;
     }
     public static void glfwSetTime(double time) {}
     public static long glfwGetTimerValue() {
@@ -907,7 +918,18 @@ public class GLFW {
     public static long glfwGetCurrentContext() {
         return CONTEXT_MAGIC;
     }
-    public static void glfwSwapBuffers(@NativeType("GLFWwindow *") long window) {}
+    public static native boolean boardwalkNativeSwapBuffers();
+    public static void glfwSwapBuffers(@NativeType("GLFWwindow *") long window) {
+        // Boardwalk: Swapping buffers!
+        // TODO(zhuowei): actually do this
+        System.out.println("I'm swapping buffers!");
+        boolean success = boardwalkNativeSwapBuffers();
+        if (!success) {
+            // Oh no
+            throw new RuntimeException("Can't swap buffers");
+        }
+        //throw new RuntimeException("Not supported");
+    }
     public static void glfwSwapInterval(int interval) {}
     public static boolean glfwExtensionSupported(@NativeType("const char *") ByteBuffer extension) {
         return false;
@@ -927,7 +949,11 @@ public class GLFW {
     public static void glfwGetMonitorContentScale(@NativeType("GLFWmonitor *") long monitor, @Nullable @NativeType("float *") float[] xscale, @Nullable @NativeType("float *") float[] yscale) {}
     public static void glfwGetWindowPos(@NativeType("GLFWwindow *") long window, @Nullable @NativeType("int *") int[] xpos, @Nullable @NativeType("int *") int[] ypos) {}
     public static void glfwGetWindowSize(@NativeType("GLFWwindow *") long window, @Nullable @NativeType("int *") int[] width, @Nullable @NativeType("int *") int[] height) {}
-    public static void glfwGetFramebufferSize(@NativeType("GLFWwindow *") long window, @Nullable @NativeType("int *") int[] width, @Nullable @NativeType("int *") int[] height) {}
+    public static void glfwGetFramebufferSize(@NativeType("GLFWwindow *") long window, @Nullable @NativeType("int *") int[] width, @Nullable @NativeType("int *") int[] height) {
+        // Boardwalk: width, height
+        width[0] = Integer.parseInt(System.getProperty("boardwalk.windowWidth"));
+        height[0] = Integer.parseInt(System.getProperty("boardwalk.windowHeight"));
+    }
     public static void glfwGetWindowFrameSize(@NativeType("GLFWwindow *") long window, @Nullable @NativeType("int *") int[] left, @Nullable @NativeType("int *") int[] top, @Nullable @NativeType("int *") int[] right, @Nullable @NativeType("int *") int[] bottom) {}
     public static void glfwGetWindowContentScale(@NativeType("GLFWwindow *") long window, @Nullable @NativeType("float *") float[] xscale, @Nullable @NativeType("float *") float[] yscale) {}
     public static void glfwGetCursorPos(@NativeType("GLFWwindow *") long window, @Nullable @NativeType("double *") double[] xpos, @Nullable @NativeType("double *") double[] ypos) {}
